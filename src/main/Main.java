@@ -10,7 +10,7 @@ public class Main {
         JFrame window = new JFrame();
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //Sets the operation that will happen by default when the user initiates a "close" on this frame. You must specify one of the following choices:
         window.setResizable(false); // Sets whether this frame is resizable by the user.
-        window.setTitle("On it");
+        window.setTitle("PixelProwess");
 
         GamePanel gamePanel = new GamePanel();
         window.add(gamePanel);

@@ -12,18 +12,24 @@ public class Player extends Entity {
     GamePanel gamePanel;
     KeyControlCenter keyControlCenter;
 
+    public final int screenX;
+    public final int screenY;
+
     public Player(GamePanel gamePanel, KeyControlCenter keyHandler){
 
         this.gamePanel = gamePanel;
         this.keyControlCenter = keyHandler;
+        screenX = gamePanel.screenWidth / 2 - (gamePanel.tileSize / 2);
+        screenY = gamePanel.screenHeight / 2 - (gamePanel.tileSize / 2);
 
         setDefaultValue();
         getPlayerImage();
     }
 
     public void setDefaultValue() {
-        x = 100;
-        y = 100;
+        worldX = gamePanel.tileSize  * gamePanel.screenWidth / 2;
+        worldY = gamePanel.tileSize  * gamePanel.screenHeight / 2;
+
         speed = 4;
         direction = "down";
     }
@@ -54,22 +60,20 @@ public class Player extends Entity {
         if(keyControlCenter.pressUp || keyControlCenter.pressDown || keyControlCenter.pressLeft || keyControlCenter.pressRight) {
             if (keyControlCenter.pressUp && !keyControlCenter.pressDown) {
                 direction = "up";
-                y -= speed;
+                worldY -= speed;
             }
             if (keyControlCenter.pressDown && !keyControlCenter.pressUp) {
                 direction = "down";
-                y += speed;
+                worldY += speed;
             }
             if (keyControlCenter.pressRight && !keyControlCenter.pressLeft) {
                 direction = "right";
-                x += speed;
+                worldX += speed;
             }
             if (keyControlCenter.pressLeft && !keyControlCenter.pressRight) {
                 direction = "left";
-                x -= speed;
+                worldX -= speed;
             }
-
-
             spriteCounter++;
             if (spriteCounter > 3) {
                 if (spriteNum == 4) {
@@ -148,6 +152,6 @@ public class Player extends Entity {
                 }
                 break;
         }
-        g2.drawImage(image, x, y, gamePanel.tileSize, gamePanel.tileSize, null);
+        g2.drawImage(image, screenX, screenY, gamePanel.tileSize, gamePanel.tileSize, null);
     }
 }

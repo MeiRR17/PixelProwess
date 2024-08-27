@@ -13,102 +13,112 @@ import java.util.Objects;
 public class TileManager {
 
     GamePanel gamePanel;
-    Tile[] tile;
-    int[][] mapTileNum;
+    public Tile[] tiles;
+    public int[][] mapNumber;
 
-    public TileManager(GamePanel gamePanel) {
+    // Constructor to initialize the TileManager
+    public TileManager(GamePanel gamePanel) throws IOException {
         this.gamePanel = gamePanel;
+        tiles = new Tile[10]; // Assume max 10 types of tiles
+        mapNumber = new int[gamePanel.worldColumn][gamePanel.worldRow]; // Map data array
 
-        tile = new Tile[10];
-        mapTileNum = new int[gamePanel.maxWorldColumn][gamePanel.maxWorldRow];
-        getTileImage();
-        loadMap("/maps/sampleMap.txt");
+        getTileImage(); // Load the tile images
+        load("/maps/sampleMap.txt"); // Load the map layout
     }
 
-    public void getTileImage() {
+    // Load tile images from the resources
+    public void getTileImage() throws IOException {
+        // Tile 0 - Grass
+        tiles[0] = new Tile();
+        tiles[0].image = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("tiles/grass.png")));
 
-        try{
+        // Tile 1 - Wall
+        tiles[1] = new Tile();
+        tiles[1].image = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("tiles/wall.png")));
+        tiles[1].collision = true;
 
-            tile[0] = new Tile();
-            tile[0].image = ImageIO.read(Objects.requireNonNull(getClass().getResource("/tiles/grass.png")));
+        // Tile 2 - Water
+        tiles[2] = new Tile();
+        tiles[2].image = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("tiles/water.png")));
+        tiles[2].collision = true;
 
-            tile[1] = new Tile();
-            tile[1].image = ImageIO.read(Objects.requireNonNull(getClass().getResource("/tiles/wall.png")));
+        // Tile 3 - Earth
+        tiles[3] = new Tile();
+        tiles[3].image = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("tiles/earth.png")));
 
-            tile[2] = new Tile();
-            tile[2].image = ImageIO.read(Objects.requireNonNull(getClass().getResource("/tiles/water.png")));
+        // Tile 4 - Tree
+        tiles[4] = new Tile();
+        tiles[4].image = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("tiles/tree.png")));
+        tiles[4].collision = true;
 
-            tile[3] = new Tile();
-            tile[3].image = ImageIO.read(Objects.requireNonNull(getClass().getResource("/tiles/earth.png")));
-
-            tile[4] = new Tile();
-            tile[4].image = ImageIO.read(Objects.requireNonNull(getClass().getResource("/tiles/tree.png")));
-
-            tile[5] = new Tile();
-            tile[5].image = ImageIO.read(Objects.requireNonNull(getClass().getResource("/tiles/sand.png")));
-
-            tile[6] = new Tile();
-            tile[6].image = ImageIO.read(Objects.requireNonNull(getClass().getResource("/tiles/tunnel_road.jpg")));
-
-
-
-        }catch (IOException e){
-            e.printStackTrace();
-        }
+        // Tile 5 - Sand
+        tiles[5] = new Tile();
+        tiles[5].image = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("tiles/sand.png")));
     }
 
-    public void loadMap(String path) {
 
-        try {
-            InputStream inputStream = getClass().getResourceAsStream(path);
-            assert inputStream != null;
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+    // Load the map from a text file and parse it into the mapNumber array
+    public void load(String path) throws IOException {
+        InputStream is = getClass().getResourceAsStream(path);
+        assert is != null; // Ensure the file is found
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
-            int column = 0;
-            int row = 0;
+        int column = 0;
+        int row = 0;
 
-            while (column < gamePanel.maxWorldColumn && row < gamePanel.maxWorldRow) {
+        // Read the map file line by line
+        while (column < gamePanel.worldColumn && row < gamePanel.worldRow) {
+            String line = br.readLine(); // Read one line from the file
 
-                String line = bufferedReader.readLine();
-
-                while (column < gamePanel.maxWorldColumn) {
-
-                    String[] numbers = line.split(" ");
-
-                    int num = Integer.parseInt(numbers[column]);
-
-                    mapTileNum[column][row] = num;
-                    column++;
-                }
-                if(column == gamePanel.maxWorldColumn) {
-                    column = 0;
-                    row++;
-                }
+            // Split the line into numbers and store them in the map array
+            while (column < gamePanel.worldColumn) {
+                String[] numbers = line.split(" ");
+                int tileCode = Integer.parseInt(numbers[column]);
+                mapNumber[column][row] = tileCode;
+                column++;
             }
-            bufferedReader.close();
 
-        }catch (Exception ignored) {}
+            // Move to the next row if we've reached the end of the current row
+            if (column == gamePanel.worldColumn) {
+                column = 0; // Reset the column
+                row++; // Move to the next row
+            }
+        }
+
+        br.close(); // Close the file reader
     }
 
-    public void draw(Graphics2D g2){
-
-        int worldColumn = 0;
+    // Draw the map on the screen by iterating through the mapNumber array
+    public void draw(Graphics2D g2) {
+        int worldCol = 0;
         int worldRow = 0;
 
-        while(worldColumn < gamePanel.maxWorldColumn && worldRow < gamePanel.maxWorldRow) {
+        // Loop through the entire map
+        while (worldCol < gamePanel.worldColumn && worldRow < gamePanel.worldRow) {
 
-            int tileNum = mapTileNum[worldColumn][worldRow];
+            int tileNumber = mapNumber[worldCol][worldRow]; // Get the current tile number
 
-            int worldX  = worldColumn * gamePanel.tileSize;
-            int worldY  = worldRow * gamePanel.tileSize;
-            int screenX = worldX - gamePanel.player.worldX + gamePanel.player.screenX;
-            int screenY = worldY - gamePanel.player.worldY + gamePanel.player.screenY;
+            // Calculate the world position
+            int worldX = worldCol * gamePanel.tileSize;
+            int worldY = worldRow * gamePanel.tileSize;
 
-            g2.drawImage(tile[tileNum].image, screenX, screenY, gamePanel.tileSize, gamePanel.tileSize, null);
-            worldColumn++;
+            // Calculate the screen position based on the player's position
+            int screenX = worldX - gamePanel.player.playerX + gamePanel.player.screenX;
+            int screenY = worldY - gamePanel.player.playerY + gamePanel.player.screenY;
 
-            if(worldColumn == gamePanel.maxWorldColumn) {
-                worldColumn = 0;
+            // Draw only tiles that are visible on the screen
+            if (worldX + gamePanel.tileSize > gamePanel.player.playerX - gamePanel.player.screenX &&
+                    worldX - gamePanel.tileSize < gamePanel.player.playerX + gamePanel.player.screenX &&
+                    worldY + gamePanel.tileSize > gamePanel.player.playerY - gamePanel.player.screenY &&
+                    worldY - gamePanel.tileSize < gamePanel.player.playerY + gamePanel.player.screenY) {
+                // Draw the tile image at the calculated screen position
+                g2.drawImage(tiles[tileNumber].image, screenX, screenY, gamePanel.tileSize, gamePanel.tileSize, null);
+            }
+            worldCol++;
+
+            // If the end of the row is reached, reset x and move to the next row
+            if (worldCol == gamePanel.worldColumn) {
+                worldCol = 0;
                 worldRow++;
             }
         }

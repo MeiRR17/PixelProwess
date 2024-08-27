@@ -3,11 +3,13 @@ package main;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class KeyControlCenter implements KeyListener {
+public class KeyHandler implements KeyListener {
 
     public boolean pressUp, pressDown, pressRight, pressLeft;
     @Override
-    public void keyTyped(KeyEvent e) {}
+    public void keyTyped(KeyEvent e) {
+
+    }
 
     @Override
     public void keyPressed(KeyEvent e) {
@@ -26,6 +28,8 @@ public class KeyControlCenter implements KeyListener {
         if(keyCode == KeyEvent.VK_LEFT) {
             pressLeft = true;
         }
+
+
     }
 
     @Override

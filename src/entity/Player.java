@@ -23,7 +23,7 @@ public class Player extends Entity{
 
         screenX = gamePanel.screenWidth/2 - (gamePanel.tileSize/2);
         screenY = gamePanel.screenHeight/2 - (gamePanel.tileSize/2);
-        bounds = new Rectangle(26, 38, 26, 40);
+        bounds = new Rectangle(26, 38, 26, 34);
         setDefaultValue();
         getPlayerImage();
     }

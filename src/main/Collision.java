@@ -24,18 +24,21 @@ public class Collision {
 
         switch (entity.direction) {
             case "up":
-                entityTopRow = (entityTopWorldY - entity.speed)/ gamePanel.tileSize;
+                // Moving up, subtract speed from the top world Y coordinate
+                entityTopRow = (entityTopWorldY - entity.speed) / gamePanel.tileSize;
                 tileNum1 = gamePanel.tileManager.mapNumber[entityLeftColumn][entityTopRow];
                 tileNum2 = gamePanel.tileManager.mapNumber[entityRightColumn][entityTopRow];
-                if(gamePanel.tileManager.tiles[tileNum1].collision || gamePanel.tileManager.tiles[tileNum2].collision) {
+                if (gamePanel.tileManager.tiles[tileNum1].collision || gamePanel.tileManager.tiles[tileNum2].collision) {
                     entity.playerCollision = true;
                 }
                 break;
+
             case "down":
-                entityBottomRow = (entityBottomWorldY - entity.speed)/ gamePanel.tileSize;
+                // Moving down, add speed to the bottom world Y coordinate
+                entityBottomRow = (entityBottomWorldY + entity.speed) / gamePanel.tileSize;
                 tileNum1 = gamePanel.tileManager.mapNumber[entityLeftColumn][entityBottomRow];
                 tileNum2 = gamePanel.tileManager.mapNumber[entityRightColumn][entityBottomRow];
-                if(gamePanel.tileManager.tiles[tileNum1].collision || gamePanel.tileManager.tiles[tileNum2].collision) {
+                if (gamePanel.tileManager.tiles[tileNum1].collision || gamePanel.tileManager.tiles[tileNum2].collision) {
                     entity.playerCollision = true;
                 }
                 break;

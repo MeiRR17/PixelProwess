@@ -23,7 +23,7 @@ public class TileManager {
         mapNumber = new int[gamePanel.worldColumn][gamePanel.worldRow]; // Map data array
 
         getTileImage(); // Load the tile images
-        load("/maps/sampleMap.txt"); // Load the map layout
+        load("/maps/map1.txt"); // Load the map layout
     }
 
     // Load tile images from the resources
@@ -37,18 +37,18 @@ public class TileManager {
         tiles[1].image = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("tiles/wall.png")));
         tiles[1].collision = true;
 
-        // Tile 2 - Water
+        // Tile 2 - Tree
         tiles[2] = new Tile();
-        tiles[2].image = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("tiles/water.png")));
+        tiles[2].image = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("tiles/tree.png")));
         tiles[2].collision = true;
 
         // Tile 3 - Earth
         tiles[3] = new Tile();
         tiles[3].image = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("tiles/earth.png")));
 
-        // Tile 4 - Tree
+        // Tile 4 - Water
         tiles[4] = new Tile();
-        tiles[4].image = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("tiles/tree.png")));
+        tiles[4].image = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("tiles/water.png")));
         tiles[4].collision = true;
 
         // Tile 5 - Sand

@@ -30,7 +30,7 @@ public class Player extends Entity{
     public void setDefaultValue() {
         playerX = gamePanel.tileSize * 23;
         playerY = gamePanel.tileSize * 23;
-        speed = 4;
+        speed = 8;
         direction = "down";
     }
 
@@ -88,6 +88,7 @@ public class Player extends Entity{
                         break;
                 }
             }
+            //sprite is an image inside an animation
             spriteCounter++;
             if (spriteCounter > 5) {
                 if (spriteNumber == 1) {

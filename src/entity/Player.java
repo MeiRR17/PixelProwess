@@ -66,6 +66,18 @@ public class Player extends Entity{
             if (keyHandler.pressLeft) {
                 direction = "left";
             }
+            if (keyHandler.pressUp && keyHandler.pressRight){
+                direction="up&right";
+            }
+            if (keyHandler.pressUp && keyHandler.pressLeft){
+                direction="up&left";
+            }
+            if (keyHandler.pressDown && keyHandler.pressRight){
+                direction="down&right";
+            }
+            if (keyHandler.pressDown && keyHandler.pressLeft){
+                direction="down&left";
+            }
 
 
             //check collision
@@ -84,6 +96,22 @@ public class Player extends Entity{
                         playerX += speed;
                         break;
                     case "left":
+                        playerX -= speed;
+                        break;
+                    case "up&right":
+                        playerY -= speed;
+                        playerX += speed;
+                        break;
+                    case "up&left":
+                        playerY -= speed;
+                        playerX -= speed;
+                        break;
+                    case "down&right":
+                        playerY += speed;
+                        playerX += speed;
+                        break;
+                    case "down&left":
+                        playerY += speed;
                         playerX -= speed;
                         break;
                 }
@@ -129,6 +157,38 @@ public class Player extends Entity{
                 }
                 break;
             case "left":
+                if(spriteNumber == 1) {
+                    image = left_move1;
+                }
+                if (spriteNumber == 2) {
+                    image = left_move2;
+                }
+                break;
+            case "up&right":
+                if(spriteNumber == 1) {
+                    image = right_move1;
+                }
+                if (spriteNumber == 2) {
+                    image = right_move2;
+                }
+                break;
+            case "up&left":
+                if(spriteNumber == 1) {
+                    image = left_move1;
+                }
+                if (spriteNumber == 2) {
+                    image = left_move2;
+                }
+                break;
+            case "down&right":
+                if(spriteNumber == 1) {
+                    image = right_move1;
+                }
+                if (spriteNumber == 2) {
+                    image = right_move2;
+                }
+                break;
+            case "down&left":
                 if(spriteNumber == 1) {
                     image = left_move1;
                 }

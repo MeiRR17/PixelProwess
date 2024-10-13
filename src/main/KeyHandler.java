@@ -35,6 +35,7 @@ public class KeyHandler implements KeyListener {
         if(keyCode == KeyEvent.VK_A) {
             pressLeft = true;
         }
+
     }
 
     @Override

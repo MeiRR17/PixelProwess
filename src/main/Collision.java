@@ -59,37 +59,68 @@ public class Collision {
                 }
                 break;
             case "up&right":
+                // Check for UP collision
                 entityTopRow = (entityTopWorldY - entity.speed) / gamePanel.tileSize;
-                entityRightColumn = (entityRightWorldX + entity.speed)/ gamePanel.tileSize;
                 tileNum1 = gamePanel.tileManager.mapNumber[entityLeftColumn][entityTopRow];
                 tileNum2 = gamePanel.tileManager.mapNumber[entityRightColumn][entityTopRow];
+                if (gamePanel.tileManager.tiles[tileNum1].collision || gamePanel.tileManager.tiles[tileNum2].collision) {
+                    entity.playerCollision = true;
+                }
+
+                // Check for RIGHT collision
+                entityRightColumn = (entityRightWorldX + entity.speed) / gamePanel.tileSize;
+                tileNum1 = gamePanel.tileManager.mapNumber[entityRightColumn][entityTopRow];
+                tileNum2 = gamePanel.tileManager.mapNumber[entityRightColumn][entityBottomRow];
                 if (gamePanel.tileManager.tiles[tileNum1].collision || gamePanel.tileManager.tiles[tileNum2].collision) {
                     entity.playerCollision = true;
                 }
                 break;
             case "up&left":
                 entityTopRow = (entityTopWorldY - entity.speed) / gamePanel.tileSize;
-                entityLeftColumn = (entityLeftWorldX - entity.speed)/ gamePanel.tileSize;
                 tileNum1 = gamePanel.tileManager.mapNumber[entityLeftColumn][entityTopRow];
                 tileNum2 = gamePanel.tileManager.mapNumber[entityRightColumn][entityTopRow];
                 if (gamePanel.tileManager.tiles[tileNum1].collision || gamePanel.tileManager.tiles[tileNum2].collision) {
                     entity.playerCollision = true;
                 }
+
+                // Check for LEFT collision
+                entityLeftColumn = (entityLeftWorldX - entity.speed) / gamePanel.tileSize;
+                tileNum1 = gamePanel.tileManager.mapNumber[entityLeftColumn][entityTopRow];
+                tileNum2 = gamePanel.tileManager.mapNumber[entityLeftColumn][entityBottomRow];
+                if (gamePanel.tileManager.tiles[tileNum1].collision || gamePanel.tileManager.tiles[tileNum2].collision) {
+                    entity.playerCollision = true;
+                }
                 break;
             case "down&right":
+                // Check for DOWN collision
                 entityBottomRow = (entityBottomWorldY + entity.speed) / gamePanel.tileSize;
-                entityRightColumn = (entityRightWorldX + entity.speed)/ gamePanel.tileSize;
                 tileNum1 = gamePanel.tileManager.mapNumber[entityLeftColumn][entityBottomRow];
+                tileNum2 = gamePanel.tileManager.mapNumber[entityRightColumn][entityBottomRow];
+                if (gamePanel.tileManager.tiles[tileNum1].collision || gamePanel.tileManager.tiles[tileNum2].collision) {
+                    entity.playerCollision = true;
+                }
+
+                // Check for RIGHT collision
+                entityRightColumn = (entityRightWorldX + entity.speed) / gamePanel.tileSize;
+                tileNum1 = gamePanel.tileManager.mapNumber[entityRightColumn][entityTopRow];
                 tileNum2 = gamePanel.tileManager.mapNumber[entityRightColumn][entityBottomRow];
                 if (gamePanel.tileManager.tiles[tileNum1].collision || gamePanel.tileManager.tiles[tileNum2].collision) {
                     entity.playerCollision = true;
                 }
                 break;
             case "down&left":
+                // Check for DOWN collision
                 entityBottomRow = (entityBottomWorldY + entity.speed) / gamePanel.tileSize;
-                entityLeftColumn = (entityLeftWorldX - entity.speed)/ gamePanel.tileSize;
                 tileNum1 = gamePanel.tileManager.mapNumber[entityLeftColumn][entityBottomRow];
                 tileNum2 = gamePanel.tileManager.mapNumber[entityRightColumn][entityBottomRow];
+                if (gamePanel.tileManager.tiles[tileNum1].collision || gamePanel.tileManager.tiles[tileNum2].collision) {
+                    entity.playerCollision = true;
+                }
+
+                // Check for LEFT collision
+                entityLeftColumn = (entityLeftWorldX - entity.speed) / gamePanel.tileSize;
+                tileNum1 = gamePanel.tileManager.mapNumber[entityLeftColumn][entityTopRow];
+                tileNum2 = gamePanel.tileManager.mapNumber[entityLeftColumn][entityBottomRow];
                 if (gamePanel.tileManager.tiles[tileNum1].collision || gamePanel.tileManager.tiles[tileNum2].collision) {
                     entity.playerCollision = true;
                 }

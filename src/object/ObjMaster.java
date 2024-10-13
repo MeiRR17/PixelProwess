@@ -6,27 +6,24 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-public class ObjMaster extends GamePanel{
+public class ObjMaster{
     public BufferedImage image;
     public String name;
     public boolean collision;
     public int worldX, worldY;
-    public Rectangle bounds = new Rectangle();
-
-    public ObjMaster() throws IOException {
-    }
+    public Rectangle bounds = new Rectangle(0 ,0 ,32 , 32);
+    public int solidAreaDefaultX = 0;
+    public int solidAreaDefaultY = 0;
 
 
     public void draw(Graphics2D g, GamePanel gamePanel) {
         int screenX = worldX - gamePanel.player.playerX + gamePanel.player.screenX;
         int screenY = worldY - gamePanel.player.playerY + gamePanel.player.screenY;
-
         if (worldX + gamePanel.tileSize > gamePanel.player.playerX - gamePanel.player.screenX &&
                 worldX - gamePanel.tileSize < gamePanel.player.playerX + gamePanel.player.screenX &&
                 worldY + gamePanel.tileSize > gamePanel.player.playerY - gamePanel.player.screenY &&
                 worldY - gamePanel.tileSize < gamePanel.player.playerY + gamePanel.player.screenY) {
-
-             g.drawImage(image, screenX, screenY, gamePanel.tileSize, gamePanel.tileSize, null);
+            g.drawImage(image, screenX, screenY, gamePanel.tileSize, gamePanel.tileSize, null);
         }
     }
     protected BufferedImage resizeImage(BufferedImage image, int width, int height) {

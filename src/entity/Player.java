@@ -37,8 +37,8 @@ public class Player extends Entity {
         this.screenX = gamePanel.screenWidth / 2 - (gamePanel.tileSize / 2);
         this.screenY = gamePanel.screenHeight / 2 - (gamePanel.tileSize / 2);
 
-        playerWidth = (int) (gamePanel.tileSize * 1.5);
-        playerHeight = (int) (gamePanel.tileSize * 1.5);
+        playerWidth = gamePanel.tileSize;
+        playerHeight = (int) (gamePanel.tileSize * 1.45);
 
         this.bounds = new Rectangle(32, 51, BOUND_WIDTH, BOUND_HEIGHT);
 
@@ -57,21 +57,21 @@ public class Player extends Entity {
     }
 
     private void loadPlayerImages() throws IOException {
-        upStand = loadImage("/player/front-stand.png");
-        upMove1 = loadImage("/player/front-walk.png");
-        upMove2 = loadImage("/player/front-walk2.png");
+        upStand = loadImage("/player/2/front-stand.png");
+        upMove1 = loadImage("/player/2/front-walk1.png");
+        upMove2 = loadImage("/player/2/front-walk2.png");
 
-        downStand = loadImage("/player/behind-stand.png");
-        downMove1 = loadImage("/player/behind-walk.png");
-        downMove2 = loadImage("/player/behind-walk2.png");
+        downStand = loadImage("/player/2/behind-stand.png");
+        downMove1 = loadImage("/player/2/behind-walk1.png");
+        downMove2 = loadImage("/player/2/behind-walk2.png");
 
-        rightStand = loadImage("/player/right-stand.png");
-        rightMove1 = loadImage("/player/right-walk.png");
-        rightMove2 = loadImage("/player/right-walk2.png");
+        rightStand = loadImage("/player/2/right-stand.png");
+        rightMove1 = loadImage("/player/2/right-walk1.png");
+        rightMove2 = loadImage("/player/2/right-walk2.png");
 
-        leftStand = loadImage("/player/left-stand.png");
-        leftMove1 = loadImage("/player/left-walk.png");
-        leftMove2 = loadImage("/player/left-walk2.png");
+        leftStand = loadImage("/player/2/left-stand.png");
+        leftMove1 = loadImage("/player/2/left-walk1.png");
+        leftMove2 = loadImage("/player/2/left-walk2.png");
     }
 
     private BufferedImage loadImage(String path) throws IOException {
@@ -81,6 +81,10 @@ public class Player extends Entity {
     public void update() {
         if (isMoving()) {
             handleMovement();
+            // check tile collision
+//            gamePanel.collisionCheck.checkTile(this);
+            //check object collision
+//            int objIndex = gamePanel.collisionCheck.checkObject(this, true);
             updateSpriteAnimation();
         } else {
             spriteNumber = 1; // Reset to standing sprite
@@ -155,8 +159,6 @@ public class Player extends Entity {
 
     public void draw(Graphics2D g2) {
         BufferedImage image = getCurrentSpriteImage();
-
-
         g2.drawImage(image, screenX, screenY, playerWidth, playerHeight, null);
         drawBounds(g2);
     }
@@ -210,5 +212,6 @@ public class Player extends Entity {
     private void drawBounds(Graphics2D g2) {
         g2.setColor(Color.RED);
         g2.drawRect(screenX + bounds.x, screenY + bounds.y, bounds.width, bounds.height);
+        //g2.drawRoundRect(screenX + bounds.x, screenY + bounds.y, bounds.width, bounds.height,10,50);
     }
 }

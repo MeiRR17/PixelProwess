@@ -80,7 +80,6 @@ public class GamePanel extends JPanel implements Runnable {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-
         }
     }
 
@@ -98,13 +97,13 @@ public class GamePanel extends JPanel implements Runnable {
         //layer1
         tileManager.draw(g2);
         //layer2
-        for (int i = 0; i < objMaster.length; i++) {
-            if (objMaster[i] != null) {
-                objMaster[i].draw(g2, this);
+        for (ObjMaster master : objMaster) {
+            if (master != null) {
+                master.draw(g2, this);
             }
+        }
             //layer3
             player.draw(g2);
             g2.dispose(); //dispose of this graphics context and release any system resources
-        }
     }
 }

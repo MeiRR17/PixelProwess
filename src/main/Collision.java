@@ -127,4 +127,50 @@ public class Collision {
                 break;
         }
     }
+
+//    public int checkObject(Entity entity, boolean playerCollision) {
+//        int index = 999;
+//
+//        for (int i = 0; i < gamePanel.objMaster.length; i++) {
+//            if(gamePanel.objMaster[i] != null) {
+//                entity.bounds.x = entity.playerX + entity.bounds.x;
+//                entity.bounds.y = entity.playerY + entity.bounds.y;
+//
+//                gamePanel.objMaster[i].bounds.x = gamePanel.objMaster[i].bounds.x + gamePanel.objMaster[i].bounds.x;
+//                gamePanel.objMaster[i].bounds.y = gamePanel.objMaster[i].bounds.y + gamePanel.objMaster[i].bounds.y;
+//
+//                switch (entity.direction) {
+//                    case "left":
+//                        entity.bounds.y -= entity.speed;
+//                        if(entity.bounds.intersects(gamePanel.objMaster[i].bounds)) {
+//                            System.out.println("left collision");
+//                        }
+//                        break;
+//                    case "right":
+//                        entity.bounds.y += entity.speed;
+//                        if(entity.bounds.intersects(gamePanel.objMaster[i].bounds)) {
+//                            System.out.println("right collision");
+//                        }
+//                        break;
+//                    case "up":
+//                        entity.bounds.x -= entity.speed;
+//                        if(entity.bounds.intersects(gamePanel.objMaster[i].bounds)) {
+//                            System.out.println("up collision");
+//                        }
+//                        break;
+//                    case "down":
+//                        entity.bounds.x += entity.speed;
+//                        if(entity.bounds.intersects(gamePanel.objMaster[i].bounds)) {
+//                            System.out.println("down collision");
+//                        }
+//                        break;
+//                }
+//            }
+//            entity.bounds.x += entity.solidAreaDefaultX;
+//            entity.bounds.y += entity.solidAreaDefaultY;
+//            gamePanel.objMaster[i].bounds.x = gamePanel.objMaster[i].solidAreaDefaultX;
+//            gamePanel.objMaster[i].bounds.x = gamePanel.objMaster[i].solidAreaDefaultX;
+//        }
+//        return index;
+//    }
 }

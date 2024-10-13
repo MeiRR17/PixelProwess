@@ -23,7 +23,7 @@ public class Player extends Entity {
     private BufferedImage leftStand, leftMove1, leftMove2;
 
     // Player properties
-    private static final int SPEED = 10;
+    private static final int SPEED = 5;
     private final int playerWidth;
     private final int playerHeight;
 
@@ -147,7 +147,7 @@ public class Player extends Entity {
 
     private void updateSpriteAnimation() {
         spriteCounter++;
-        if (spriteCounter > 3) {
+        if (spriteCounter > 7) {
             spriteNumber = (spriteNumber % 4) + 1; // Loop through sprite numbers 1 to 4
             spriteCounter = 0;
         }

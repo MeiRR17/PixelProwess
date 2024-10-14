@@ -18,7 +18,7 @@ public class ObjectPlacer {
         gamePanel.objMaster[0].worldX = 26 * gamePanel.tileSize;
         gamePanel.objMaster[0].worldY = 26 * gamePanel.tileSize;
 
-        gamePanel.objMaster[1] = new Rifle();
+        gamePanel.objMaster[1] = new object.ObjMaster();
         gamePanel.objMaster[1].worldX = 27 * gamePanel.tileSize;
         gamePanel.objMaster[1].worldY = 26 * gamePanel.tileSize;
     }

@@ -15,7 +15,6 @@ public class ObjMaster{
     public int solidAreaDefaultX = 0;
     public int solidAreaDefaultY = 0;
 
-
     public void draw(Graphics2D g, GamePanel gamePanel) {
         int screenX = worldX - gamePanel.player.playerX + gamePanel.player.screenX;
         int screenY = worldY - gamePanel.player.playerY + gamePanel.player.screenY;
@@ -26,6 +25,7 @@ public class ObjMaster{
             g.drawImage(image, screenX, screenY, gamePanel.tileSize, gamePanel.tileSize, null);
         }
     }
+
     protected BufferedImage resizeImage(BufferedImage image, int width, int height) {
         // Create a new BufferedImage with the desired dimensions
         BufferedImage resizedImage = new BufferedImage(width, height, image.getType());

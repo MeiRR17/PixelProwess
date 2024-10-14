@@ -2,6 +2,8 @@ package entity;
 
 import main.GamePanel;
 import main.KeyHandler;
+import main.ObjectPlacer;
+import object.Gun;
 import object.Scar;
 import utility.MouseInfoUtil;
 
@@ -34,6 +36,8 @@ public class Player extends Entity {
     private static final int BOUND_WIDTH = 31;
     private static final int BOUND_HEIGHT = 30;
 
+    public Gun[] guns = new Gun[5];
+
     public Player(GamePanel gamePanel, KeyHandler keyHandler) throws IOException {
         this.gamePanel = gamePanel;
         this.keyHandler = keyHandler;
@@ -45,6 +49,8 @@ public class Player extends Entity {
         playerHeight = (int) (gamePanel.tileSize * 1.45);
 
         this.bounds = new Rectangle(32, 51, BOUND_WIDTH, BOUND_HEIGHT);
+        PickGun pickGun = new PickGun(this);
+        pickGun.getGun();
 
         solidAreaDefaultX = bounds.x;
         solidAreaDefaultY = bounds.y;
@@ -158,42 +164,54 @@ public class Player extends Entity {
     }
 
     public void draw(Graphics2D g2) throws IOException {
-        //Draw the player's current sprite
+        // Draw the player's current sprite
         BufferedImage image = getCurrentSpriteImage();
         g2.drawImage(image, screenX, screenY, playerWidth, playerHeight, null);
 
-
-
-        //Calculate the angle between the player and the mouse
+        // Calculate the angle between the player and the mouse
         double angle = calculateAngleToMouse();
 
-        double angleOffset = Math.toRadians(-45); // Starting angle offset to the right
-
+        // Adjust the angle to make sure the gun is aligned correctly with the mouse
+        double angleOffset = Math.toRadians(-45); // Offset to align the gun properly
         angle += angleOffset;
 
+        // Define the radius at which the gun is positioned
         int radius = 85;
 
-        //Calculate the weapon's position using the adjusted angle and radius
-        int weaponX = (int) (screenX + (double) playerWidth / 2 + radius * Math.cos(angle));
-        int weaponY = (int) (screenY + (double) playerHeight / 2 + radius * Math.sin(angle));
+        // Calculate the player's center coordinates
+        int playerCenterX = screenX + playerWidth / 2;
+        int playerCenterY = screenY + playerHeight / 2;
 
-        //Draw the circular path around the player for visualization
+        // Calculate the weapon's position based on the angle and the radius around the player
+        int weaponX = (int) (playerCenterX + radius * Math.cos(angle));
+        int weaponY = (int) (playerCenterY + radius * Math.sin(angle));
+
+        // Draw the circular path around the player (for debugging)
         drawWeaponPath(g2, radius);
 
+        // Draw a green line extending from the gun for debugging purposes
         drawAngleLine(g2, angle, radius, weaponX, weaponY);
 
-        Scar scar = new Scar();
+        // Get the player's current gun
+        Gun gun = guns[0]; // Ensure a gun is assigned to this slot
 
-        //Set the Scar's position
-        scar.worldX = weaponX;
-        scar.worldY = weaponY;
+        if (gun != null) {
+            // Set the gun's position based on the calculated position
+            gun.worldX = weaponX;
+            gun.worldY = weaponY;
 
-        //draw the Scar at its calculated position and angle
-        scar.draw(g2, gamePanel, angle);
+            // Draw the gun at its calculated position and angle, passing the player's center for proper rotation
+            gun.draw(g2, gamePanel, angle, playerCenterX, playerCenterY);
+        } else {
+            System.out.println("No gun assigned to player.");
+        }
 
-        //Draw the player's collision bounds
+        // Draw the player's collision bounds
         drawBounds(g2);
     }
+
+
+
 
 
     private void drawAngleLine(Graphics2D g2, double angle, int radius, int weaponX, int weaponY) {

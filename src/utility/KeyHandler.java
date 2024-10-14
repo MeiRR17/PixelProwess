@@ -1,11 +1,11 @@
-package main;
+package utility;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class KeyHandler implements KeyListener {
 
-    public boolean pressUp, pressDown, pressRight, pressLeft;
+    public boolean pressUp, pressDown, pressRight, pressLeft, pressSpace;
 
     @Override
     public void keyTyped(KeyEvent e) {
@@ -36,6 +36,10 @@ public class KeyHandler implements KeyListener {
             pressLeft = true;
         }
 
+        // Space for shooting
+        if(keyCode == KeyEvent.VK_SPACE) {
+            pressSpace = true;
+        }
     }
 
     @Override
@@ -60,6 +64,11 @@ public class KeyHandler implements KeyListener {
         // A for left
         if(keyCode == KeyEvent.VK_A) {
             pressLeft = false;
+        }
+
+        // Space for shooting
+        if(keyCode == KeyEvent.VK_SPACE) {
+            pressSpace = false;
         }
     }
 }

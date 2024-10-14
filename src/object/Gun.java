@@ -8,7 +8,7 @@ import java.awt.image.BufferedImage;
 
 public class Gun {
     protected String name;
-    protected BufferedImage image;
+    public BufferedImage image;
     public int worldX;
     public int worldY;
 

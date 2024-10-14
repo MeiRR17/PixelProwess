@@ -1,57 +1,36 @@
-//package object;
-//
-//import main.GamePanel;
-//import java.awt.*;
-//
-//public class Bullet {
-//    private int x, y; // Position of the bullet
-//    private int speed; // Speed of the bullet
-//    private int direction; // Direction of the bullet
-//    private boolean active; // Is the bullet active or not
-//    public double distanceTravelled; // Distance traveled by the bullet
-//
-//    public Bullet(int startX, int startY, int direction, int speed) {
-//        this.x = startX;
-//        this.y = startY;
-//        this.direction = direction;
-//        this.speed = speed;
-//        this.active = true;
-//        this.distanceTravelled = 0; // Initialize distance
-//    }
-//
-//    public void update() {
-//        if (active) {
-//            // Update bullet position based on direction
-//            switch (direction) {
-//                case 1: // Right
-//                    x += speed;
-//                    break;
-//                case 2: // Down
-//                    y += speed;
-//                    break;
-//                case 3: // Left
-//                    x -= speed;
-//                    break;
-//                case 4: // Up
-//                    y -= speed;
-//                    break;
-//            }
-//
-//            distanceTravelled += speed; // Increase distance traveled
-//
-//            // Deactivate bullet if it exceeds a certain distance (for example, 500 pixels)
-//            if (distanceTravelled >= 500) {
-//                active = false; // Mark as inactive
-//            }
-//        }
-//    }
-//
-//    public boolean isActive() {
-//        return active;
-//    }
-//
-//    public void draw(Graphics2D g2) {
-//        g2.setColor(Color.YELLOW); // Color for the bullet
-//        g2.fillRect(x, y, 5, 5); // Draw the bullet as a rectangle
-//    }
-//}
+package object;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.Objects;
+
+public class Bullet {
+    public int x, y;
+    public double angle; // Direction of the bullet
+    public final int speed = 40;
+    private BufferedImage bulletImage;
+
+    public Bullet(int x, int y, double angle) throws IOException {
+        this.x = x;
+        this.y = y;
+        this.angle = angle;
+        bulletImage = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("weapon/bullet/pistolBullet.png")));
+    }
+
+    public void update() {
+        // Update the position of the bullet based on its angle and speed
+        x += (int) (speed * Math.cos(angle));
+        y += (int) (speed * Math.sin(angle));
+        this.x += speed;
+    }
+
+    public boolean isOffScreen() {
+        return x < 0 || x > 1920 || y < 0 || y > 1080;
+    }
+
+    public void draw(Graphics2D g2) {
+        g2.drawImage(bulletImage, x, y, 10, 10, null); // Adjust bullet size if necessary
+    }
+}

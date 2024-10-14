@@ -119,9 +119,6 @@ public class Player extends Entity {
         for (int i = bullets.size() - 1; i >= 0; i--) {
             Bullet bullet = bullets.get(i);
             bullet.update();
-            if (bullet.isOffScreen()) {
-                bullets.remove(i); // Remove off-screen bullets
-            }
         }
     }
 

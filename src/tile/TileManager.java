@@ -23,7 +23,7 @@ public class TileManager {
         mapNumber = new int[gamePanel.worldColumn][gamePanel.worldRow]; // Map data array
 
         getTileImage(); // Load the tile images
-        load("/maps/map1.txt"); // Load the map layout
+        load("/maps/map3.txt"); // Load the map layout
     }
 
     // Load tile images from the resources

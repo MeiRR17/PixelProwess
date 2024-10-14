@@ -2,12 +2,16 @@ package entity;
 
 import main.GamePanel;
 import main.KeyHandler;
+import object.Scar;
+import utility.MouseInfoUtil;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Objects;
+import object.Rifle;
 
 public class Player extends Entity {
     private final GamePanel gamePanel;
@@ -23,9 +27,9 @@ public class Player extends Entity {
     private BufferedImage leftStand, leftMove1, leftMove2;
 
     // Player properties
-    private static final int SPEED = 5;
-    private final int playerWidth;
-    private final int playerHeight;
+    private static final int SPEED = 15;
+    public final int playerWidth;
+    public final int playerHeight;
 
     private static final int BOUND_WIDTH = 31;
     private static final int BOUND_HEIGHT = 30;
@@ -81,10 +85,6 @@ public class Player extends Entity {
     public void update() {
         if (isMoving()) {
             handleMovement();
-            // check tile collision
-//            gamePanel.collisionCheck.checkTile(this);
-            //check object collision
-//            int objIndex = gamePanel.collisionCheck.checkObject(this, true);
             updateSpriteAnimation();
         } else {
             spriteNumber = 1; // Reset to standing sprite
@@ -157,11 +157,78 @@ public class Player extends Entity {
         }
     }
 
-    public void draw(Graphics2D g2) {
+    public void draw(Graphics2D g2) throws IOException {
+        //Draw the player's current sprite
         BufferedImage image = getCurrentSpriteImage();
         g2.drawImage(image, screenX, screenY, playerWidth, playerHeight, null);
+
+
+
+        //Calculate the angle between the player and the mouse
+        double angle = calculateAngleToMouse();
+
+        double angleOffset = Math.toRadians(-45); // Starting angle offset to the right
+
+        angle += angleOffset;
+
+        int radius = 85;
+
+        //Calculate the weapon's position using the adjusted angle and radius
+        int weaponX = (int) (screenX + (double) playerWidth / 2 + radius * Math.cos(angle));
+        int weaponY = (int) (screenY + (double) playerHeight / 2 + radius * Math.sin(angle));
+
+        //Draw the circular path around the player for visualization
+        drawWeaponPath(g2, radius);
+
+        drawAngleLine(g2, angle, radius, weaponX, weaponY);
+
+        Scar scar = new Scar();
+
+        //Set the Scar's position
+        scar.worldX = weaponX;
+        scar.worldY = weaponY;
+
+        //draw the Scar at its calculated position and angle
+        scar.draw(g2, gamePanel, angle);
+
+        //Draw the player's collision bounds
         drawBounds(g2);
     }
+
+
+    private void drawAngleLine(Graphics2D g2, double angle, int radius, int weaponX, int weaponY) {
+        // Calculate the end point of the line
+        int lineLength = 1000;
+
+        int lineEndX = (int) (weaponX + Math.cos(angle) * lineLength);
+        int lineEndY = (int) (weaponY + Math.sin(angle) * lineLength);
+
+        g2.setColor(Color.GREEN);
+        g2.drawLine(weaponX, weaponY, lineEndX, lineEndY); // Line from weapon to the end point
+    }
+
+
+
+
+
+
+    // Method to draw the circular path
+    private void drawWeaponPath(Graphics2D g2, int radius) {
+        // Calculate the center of the player in screen coordinates
+        int playerCenterX = screenX + playerWidth / 2;
+        int playerCenterY = screenY + playerHeight / 2;
+
+        // Set the color and stroke for the circle
+        g2.setColor(Color.BLUE); // Choose a color for the path
+        g2.setStroke(new BasicStroke(2)); // Set the stroke width
+
+        // Draw the circle around the player
+        g2.drawOval(playerCenterX - radius, playerCenterY - radius, radius * 2, radius * 2);
+    }
+
+
+
+
 
     private BufferedImage getCurrentSpriteImage() {
         return switch (direction) {
@@ -214,4 +281,25 @@ public class Player extends Entity {
         g2.drawRect(screenX + bounds.x, screenY + bounds.y, bounds.width, bounds.height);
         //g2.drawRoundRect(screenX + bounds.x, screenY + bounds.y, bounds.width, bounds.height,10,50);
     }
+
+    private double calculateAngleToMouse() {
+        // Get player screen position
+        int playerCenterX = screenX + playerWidth / 2;
+        int playerCenterY = screenY + playerHeight / 2;
+
+        // Get mouse position relative to the game panel
+        Point mousePosition = MouseInfoUtil.getMousePosition();
+        int mouseX = mousePosition.x - gamePanel.getLocationOnScreen().x;
+        int mouseY = mousePosition.y - gamePanel.getLocationOnScreen().y;
+
+        // Calculate the angle in radians
+        double angle = Math.atan2(mouseY - playerCenterY, mouseX - playerCenterX);
+
+        // Add 40 degrees offset to correct rifle alignment (convert 45 degrees to radians)
+        double adjustedAngle = angle + Math.toRadians(45);
+
+        return adjustedAngle;
+    }
+
+
 }

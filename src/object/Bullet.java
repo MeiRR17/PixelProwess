@@ -26,6 +26,8 @@ public class Bullet {
         // Update the position of the bullet based on its angle and speed
         x += (int) (speed * Math.cos(angle));
         y += (int) (speed * Math.sin(angle));
+        bounds.x = x; // Update bounds position
+        bounds.y = y; // Update bounds position
     }
 
     public void draw(Graphics2D g2) {

@@ -1,9 +1,10 @@
 package entity;
 
 import main.GamePanel;
+import object.Gun;
 import utility.KeyHandler;
 import object.Bullet;
-import object.Gun;
+import object.Weapon;
 import object.Scar;
 import utility.MouseHandler;
 import utility.MouseInfoUtil;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 public class Player extends Entity {
     private final GamePanel gamePanel;
@@ -40,7 +42,7 @@ public class Player extends Entity {
     private static final int BOUND_WIDTH = 31;
     private static final int BOUND_HEIGHT = 30;
 
-    public Gun[] guns = new Gun[5];
+    public Weapon[] guns = new Weapon[5];
 
     private List<Bullet> bullets;
 
@@ -80,23 +82,48 @@ public class Player extends Entity {
         direction = "down";
     }
 
+
     private void loadPlayerImages() throws IOException {
-        upStand = loadImage("/player/2/front-stand.png");
-        upMove1 = loadImage("/player/2/front-walk1.png");
-        upMove2 = loadImage("/player/2/front-walk2.png");
+        String[][] skins = {
+                {"/player/skin1/up/stand.png", "/player/skin1/up/walk1.png", "/player/skin1/up/walk2.png"},
+                {"/player/skin1/down/stand.png", "/player/skin1/down/walk1.png", "/player/skin1/down/walk2.png"},
+                {"/player/skin1/right/stand.png", "/player/skin1/right/walk1.png", "/player/skin1/right/walk2.png"},
+                {"/player/skin1/left/stand.png", "/player/skin1/left/walk1.png", "/player/skin1/left/walk2.png"},
+                {"/player/skin2/up/stand.png", "/player/skin2/up/walk1.png", "/player/skin2/up/walk2.png"},
+                {"/player/skin2/down/stand.png", "/player/skin2/down/walk1.png", "/player/skin2/down/walk2.png"},
+                {"/player/skin2/right/stand.png", "/player/skin2/right/walk1.png", "/player/skin2/right/walk2.png"},
+                {"/player/skin2/left/stand.png", "/player/skin2/left/walk1.png", "/player/skin2/left/walk2.png"},
+                {"/player/skin3/up/stand.png", "/player/skin3/up/walk1.png", "/player/skin3/up/walk2.png"},
+                {"/player/skin3/down/stand.png", "/player/skin3/down/walk1.png", "/player/skin3/down/walk2.png"},
+                {"/player/skin3/right/stand.png", "/player/skin3/right/walk1.png", "/player/skin3/right/walk2.png"},
+                {"/player/skin3/left/stand.png", "/player/skin3/left/walk1.png", "/player/skin3/left/walk2.png"},
+                {"/player/skin4/up/stand.png", "/player/skin4/up/walk1.png", "/player/skin4/up/walk2.png"},
+                {"/player/skin4/down/stand.png", "/player/skin4/down/walk1.png", "/player/skin4/down/walk2.png"},
+                {"/player/skin4/right/stand.png", "/player/skin4/right/walk1.png", "/player/skin4/right/walk2.png"},
+                {"/player/skin4/left/stand.png", "/player/skin4/left/walk1.png", "/player/skin4/left/walk2.png"},
+        };
 
-        downStand = loadImage("/player/2/behind-stand.png");
-        downMove1 = loadImage("/player/2/behind-walk1.png");
-        downMove2 = loadImage("/player/2/behind-walk2.png");
+        Random rand = new Random();
+        int skinIndex = rand.nextInt(4) * 4;
 
-        rightStand = loadImage("/player/2/right-stand.png");
-        rightMove1 = loadImage("/player/2/right-walk1.png");
-        rightMove2 = loadImage("/player/2/right-walk2.png");
+        BufferedImage[] standImages = new BufferedImage[4];
+        BufferedImage[] move1Images = new BufferedImage[4];
+        BufferedImage[] move2Images = new BufferedImage[4];
 
-        leftStand = loadImage("/player/2/left-stand.png");
-        leftMove1 = loadImage("/player/2/left-walk1.png");
-        leftMove2 = loadImage("/player/2/left-walk2.png");
+        for (int i = 0; i < 4; i++) {
+            standImages[i] = loadImage(skins[skinIndex + i][0]);
+            move1Images[i] = loadImage(skins[skinIndex + i][1]);
+            move2Images[i] = loadImage(skins[skinIndex + i][2]);
+        }
+
+        // Assign loaded images to variables
+        upStand = standImages[0]; upMove1 = move1Images[0]; upMove2 = move2Images[0];
+        downStand = standImages[1]; downMove1 = move1Images[1]; downMove2 = move2Images[1];
+        rightStand = standImages[2]; rightMove1 = move1Images[2]; rightMove2 = move2Images[2];
+        leftStand = standImages[3]; leftMove1 = move1Images[3]; leftMove2 = move2Images[3];
     }
+
+
 
     private BufferedImage loadImage(String path) throws IOException {
         return ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(path)));
@@ -105,6 +132,8 @@ public class Player extends Entity {
     public void update() throws IOException {
         if (isMoving()) {
             handleMovement();
+            int objIndex = gamePanel.collisionCheck.checkObject(this, true);
+            pickUpObject(objIndex);
             updateSpriteAnimation();
         } else {
             spriteNumber = 1; // Reset to standing sprite
@@ -119,6 +148,10 @@ public class Player extends Entity {
         for (int i = bullets.size() - 1; i >= 0; i--) {
             Bullet bullet = bullets.get(i);
             bullet.update();
+            gamePanel.collisionCheck.checkBullet(bullet);
+            if (bullet.bulletCollision){
+                bullets.remove(i);
+            }
         }
     }
 
@@ -245,7 +278,6 @@ public class Player extends Entity {
         for (Bullet bullet : bullets) {
             bullet.draw(g2); // Draw the bullet
         }
-
         drawBounds(g2);
     }
 
@@ -283,11 +315,6 @@ public class Player extends Entity {
         g2.drawLine(weaponX, weaponY, lineEndX, lineEndY); // Line from weapon to the end point
     }
 
-
-
-
-
-
     // Method to draw the circular path
     private void drawWeaponPath(Graphics2D g2, int radius) {
         // Calculate the center of the player in screen coordinates
@@ -316,7 +343,7 @@ public class Player extends Entity {
         };
     }
 
-    private BufferedImage getUpImage() {
+    private BufferedImage getDownImage() {
         return switch (spriteNumber) {
             case 1, 3 -> downStand;
             case 2 -> downMove1;
@@ -325,7 +352,7 @@ public class Player extends Entity {
         };
     }
 
-    private BufferedImage getDownImage() {
+    private BufferedImage getUpImage() {
         return switch (spriteNumber) {
             case 1, 3 -> upStand;
             case 2 -> upMove1;
@@ -379,5 +406,18 @@ public class Player extends Entity {
 
     public void setMousePressed(boolean mousePressed) {
         this.mousePressed = mousePressed; // Set mouse pressed state
+    }
+
+    public void pickUpObject (int i) {
+        if (i != 999) {
+            String objectName = gamePanel.objMaster[i].name;
+
+            switch (objectName) {
+                case "pistol":
+                    gamePanel.objMaster[i] = null;
+                    break;
+            }
+        }
+
     }
 }

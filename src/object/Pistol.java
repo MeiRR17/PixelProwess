@@ -1,15 +1,16 @@
 package object;
 
 import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Objects;
 
-public class Pistol extends ObjMaster{
+public class Pistol extends ObjMaster {
+
     public Pistol() throws IOException {
+        // Call the superclass constructor with the loaded image as the first statement
+        super(ImageIO.read(Objects.requireNonNull(Pistol.class.getClassLoader().getResource("object/weapon/icon/pistol/pistol1.png"))));
+
         name = "pistol";
-        BufferedImage img = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("weapon/icon/pistol1.png")));
-        image = resizeImage(img, 32, 32);
         collision = true;
     }
 }

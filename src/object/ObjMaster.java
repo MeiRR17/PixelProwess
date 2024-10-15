@@ -4,7 +4,6 @@ import main.GamePanel;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 
 public class ObjMaster{
     public BufferedImage image;
@@ -14,6 +13,13 @@ public class ObjMaster{
     public Rectangle bounds = new Rectangle(0 ,0 ,32 , 32);
     public int solidAreaDefaultX = 0;
     public int solidAreaDefaultY = 0;
+
+    public ObjMaster(BufferedImage image){
+        this.image = resizeImage(image, 32, 32);
+    }
+
+
+
 
     public void draw(Graphics2D g, GamePanel gamePanel) {
         int screenX = worldX - gamePanel.player.playerX + gamePanel.player.screenX;

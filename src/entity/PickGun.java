@@ -2,6 +2,7 @@ package entity;
 
 import object.Rifle;
 import object.Scar;
+import object.Weapon;
 
 import java.io.IOException;
 import java.util.Random;
@@ -17,13 +18,9 @@ public class PickGun {
 
     public void getGun() throws IOException {
         // Generate a random number (0 or 1)
-        int randomGun = random.nextInt(2);
+        int randomGun = random.nextInt(3);
 
-        // Assign either a Scar or Rifle based on the random number
-        if (randomGun == 0) {
-            player.guns[0] = new Scar();
-        } else {
-            player.guns[0] = new Rifle();
-        }
+        Weapon selectedGun;
+
     }
 }

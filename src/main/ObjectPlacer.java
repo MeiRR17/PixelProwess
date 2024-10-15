@@ -15,11 +15,7 @@ public class ObjectPlacer {
 
     public void placeObjects() throws IOException {
         gamePanel.objMaster[0] = new Pistol();
-        gamePanel.objMaster[0].worldX = 26 * gamePanel.tileSize;
-        gamePanel.objMaster[0].worldY = 26 * gamePanel.tileSize;
-
-        gamePanel.objMaster[1] = new object.ObjMaster();
-        gamePanel.objMaster[1].worldX = 27 * gamePanel.tileSize;
-        gamePanel.objMaster[1].worldY = 26 * gamePanel.tileSize;
+        gamePanel.objMaster[0].worldX = 40 * gamePanel.tileSize;
+        gamePanel.objMaster[0].worldY = 40 * gamePanel.tileSize;
     }
 }

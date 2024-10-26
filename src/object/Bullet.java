@@ -12,13 +12,11 @@ public class Bullet {
     public final int speed = 30;
     private BufferedImage bulletImage;
     public boolean bulletCollision = false;
-    public Rectangle bounds;
 
     public Bullet(int x, int y, double angle) throws IOException {
         this.x = x;
         this.y = y;
         this.angle = angle;
-        bounds = new Rectangle(x, y, 16, 16);
         bulletImage = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("object/weapon/bullet/rifle.png")));
     }
 
@@ -26,8 +24,6 @@ public class Bullet {
         // Update the position of the bullet based on its angle and speed
         x += (int) (speed * Math.cos(angle));
         y += (int) (speed * Math.sin(angle));
-        bounds.x = x; // Update bounds position
-        bounds.y = y; // Update bounds position
     }
 
     public void draw(Graphics2D g2) {
@@ -36,6 +32,8 @@ public class Bullet {
     }
     public void drawRedBox(Graphics2D g2) {
         g2.setColor(Color.RED);
-        g2.drawRect(x, y, bounds.width, bounds.height);
+    }
+    public Rectangle calculateRectangle(){
+        return new Rectangle(this.x,this.y,10,10);
     }
 }

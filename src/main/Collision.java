@@ -3,8 +3,10 @@ package main;
 import entity.Entity;
 import object.Bullet;
 
+import java.awt.*;
+
 public class Collision {
-    GamePanel gamePanel;
+    static GamePanel gamePanel;
 
     public Collision(GamePanel gamePanel) {
         this.gamePanel = gamePanel;
@@ -129,30 +131,31 @@ public class Collision {
         }
     }
 
-    public void checkBullet(Bullet bullet) {
-        int bulletLeftWorldX = bullet.x + bullet.bounds.x;
-        int bulletRightWorldX = bullet.x + bullet.bounds.x + bullet.bounds.width;
-        int bulletTopWorldY = bullet.y + bullet.bounds.y;
-        int bulletBottomWorldY = bullet.y + bullet.bounds.y + bullet.bounds.height;
+    public static boolean checkCollision (Rectangle rect1) {
+        int entityLeftCol = rect1.x / gamePanel.tileSize;
+        int entityRightCol = (rect1.x + rect1.width) / gamePanel.tileSize;
+        int entityTopRow = rect1.y / gamePanel.tileSize;
+        int entityBottomRow = (rect1.y + rect1.height) / gamePanel.tileSize;
 
-        int bulletLeftColumn = bulletLeftWorldX / gamePanel.tileSize;
-        int bulletRightColumn = bulletRightWorldX / gamePanel.tileSize;
-        int bulletTopRow = bulletTopWorldY / gamePanel.tileSize;
-        int bulletBottomRow = bulletBottomWorldY / gamePanel.tileSize;
-
-        int tileNum1, tileNum2;
-
-        tileNum1 = gamePanel.tileManager.mapNumber[bulletLeftColumn][bulletTopRow];
-        tileNum2 = gamePanel.tileManager.mapNumber[bulletRightColumn][bulletTopRow];
-        if (gamePanel.tileManager.tiles[tileNum1].collision || gamePanel.tileManager.tiles[tileNum2].collision) {
-            bullet.bulletCollision = true; // Set a flag in the bullet if collision occurs
+        boolean intersects = false;
+        int worldCol = 0;
+        int worldRow = 0;
+        while (worldCol < gamePanel.worldColumn && worldRow < gamePanel.worldRow){
+            if (gamePanel.tileManager.collisionBounds[worldCol][worldRow] != null) {
+                // Check if the entity intersects with this tile's collision bounds
+                if (rect1.intersects(gamePanel.tileManager.collisionBounds[worldCol][worldRow])) {
+                    intersects = true;
+                    break; // Stop once a collision is detected
+                }
+            }
+            worldCol++;
+            if (worldCol == gamePanel.worldColumn) {
+                if (intersects) {break;}
+                worldCol = 0;
+                worldRow++;
+            }
         }
-
-        tileNum1 = gamePanel.tileManager.mapNumber[bulletLeftColumn][bulletBottomRow];
-        tileNum2 = gamePanel.tileManager.mapNumber[bulletRightColumn][bulletBottomRow];
-        if (gamePanel.tileManager.tiles[tileNum1].collision || gamePanel.tileManager.tiles[tileNum2].collision) {
-            bullet.bulletCollision = true; // Collision detected
-        }
+        return intersects;
     }
 
     public int checkObject(Entity entity, boolean player) {

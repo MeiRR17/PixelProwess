@@ -15,12 +15,14 @@ public class TileManager {
     GamePanel gamePanel;
     public Tile[] tiles;
     public int[][] mapNumber;
+    public Rectangle[][] collisionBounds;
 
     // Constructor to initialize the TileManager
     public TileManager(GamePanel gamePanel) throws IOException {
         this.gamePanel = gamePanel;
         tiles = new Tile[10]; // Assume max 10 types of tiles
         mapNumber = new int[gamePanel.worldColumn][gamePanel.worldRow]; // Map data array
+        collisionBounds = new Rectangle[gamePanel.worldColumn][gamePanel.worldRow];
 
         getTileImage(); // Load the tile images
         load("/maps/map3.txt"); // Load the map layout
@@ -75,6 +77,9 @@ public class TileManager {
                 String[] numbers = line.split(" ");
                 int tileCode = Integer.parseInt(numbers[column]);
                 mapNumber[column][row] = tileCode;
+                if (tileCode==1||tileCode==2) {
+                    collisionBounds[column][row] = new Rectangle(column * gamePanel.tileSize, row * gamePanel.tileSize, gamePanel.tileSize, gamePanel.tileSize);
+                }
                 column++;
             }
 
@@ -105,6 +110,9 @@ public class TileManager {
             // Calculate the screen position based on the player's position
             int screenX = worldX - gamePanel.player.playerX + gamePanel.player.screenX;
             int screenY = worldY - gamePanel.player.playerY + gamePanel.player.screenY;
+            if (tileNumber==1||tileNumber==2){
+                collisionBounds[worldCol][worldRow] = new Rectangle(screenX, screenY, gamePanel.tileSize, gamePanel.tileSize);
+            }
 
             // Draw only tiles that are visible on the screen
             if (worldX + gamePanel.tileSize > gamePanel.player.playerX - gamePanel.player.screenX &&

@@ -1,5 +1,6 @@
 package entity;
 
+import main.Collision;
 import main.GamePanel;
 import object.Gun;
 import utility.KeyHandler;
@@ -147,23 +148,16 @@ public class Player extends Entity {
         // Update bullets
         for (int i = bullets.size() - 1; i >= 0; i--) {
             Bullet bullet = bullets.get(i);
-            bullet.update();
-            gamePanel.collisionCheck.checkBullet(bullet);
-            if (bullet.bulletCollision){
-                bullets.remove(i);
+            if (Collision.checkCollision(bullet.calculateRectangle())) {
+                System.out.println("hit");
+                bullets.remove(i); //the bullet doesn't get removed from
+            } else {
+                bullet.update();
             }
         }
     }
 
-    private void shoot() throws IOException {
-        long currentTime = System.currentTimeMillis();
-        if (currentTime - lastShotTime > shootingDelay) { // shootingDelay in milliseconds
-            int bulletX = (int) (screenX + (double) playerWidth / 2 + 85 * Math.cos(angle));
-            int bulletY = (int) (screenY + (double) playerHeight / 2 + 85 * Math.sin(angle));
-            bullets.add(new Bullet(bulletX, bulletY, angle)); // Create and add the bullet
-            lastShotTime = currentTime; // Update last shot time
-        }
-    }
+
 
 
 
@@ -290,7 +284,15 @@ public class Player extends Entity {
             bullets.add(new Bullet(bulletX, bulletY, angle));
     }
 
-
+    private void shoot() throws IOException {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastShotTime > shootingDelay) { // shootingDelay in milliseconds
+            int bulletX = (int) (screenX + (double) playerWidth / 2 + 85 * Math.cos(angle));
+            int bulletY = (int) (screenY + (double) playerHeight / 2 + 85 * Math.sin(angle));
+            bullets.add(new Bullet(bulletX, bulletY, angle)); // Create and add the bullet
+            lastShotTime = currentTime; // Update last shot time
+        }
+    }
 
 
     public void updateAngle(int mouseX, int mouseY) {

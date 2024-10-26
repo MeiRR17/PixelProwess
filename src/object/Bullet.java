@@ -2,6 +2,7 @@ package object;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Objects;
@@ -9,15 +10,15 @@ import java.util.Objects;
 public class Bullet {
     public int x, y;
     public double angle; // Direction of the bullet
-    public final int speed = 30;
-    private BufferedImage bulletImage;
+    public final int speed = 10;
+    private BufferedImage image;
     public boolean bulletCollision = false;
 
-    public Bullet(int x, int y, double angle) throws IOException {
+    public Bullet(int x, int y, double angle, BufferedImage image) {
         this.x = x;
         this.y = y;
         this.angle = angle;
-        bulletImage = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("object/weapon/bullet/rifle.png")));
+        this.image = image;
     }
 
     public void update() {
@@ -27,13 +28,18 @@ public class Bullet {
     }
 
     public void draw(Graphics2D g2) {
-        g2.drawImage(bulletImage, x, y, 10, 10, null); // Adjust bullet size if necessary
-        drawRedBox(g2);
+        AffineTransform originalTransform = g2.getTransform();
+
+        //Rotate bullet image based on the shooting angle
+        g2.translate(x, y);
+        g2.rotate(angle);
+
+        //Draw bullet image at current position
+        g2.drawImage(image, image.getWidth(), image.getHeight(), 10, 5, null);
+        g2.setTransform(originalTransform);
     }
-    public void drawRedBox(Graphics2D g2) {
-        g2.setColor(Color.RED);
-    }
+
     public Rectangle calculateRectangle(){
-        return new Rectangle(this.x,this.y,10,10);
+        return new Rectangle(x,y,10,5);
     }
 }

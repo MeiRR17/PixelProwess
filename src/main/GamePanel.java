@@ -35,7 +35,7 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
     Thread gameThread;
     public Collision collisionCheck = new Collision(this);
     public ObjectPlacer objectPlacer = new ObjectPlacer(this);
-    public Player player = new Player(this, keyHandler, mouseHandler);
+    public Player player = new Player(this, keyHandler, null);
     public ObjMaster[] objMaster = new ObjMaster[25];
 
 
@@ -92,7 +92,8 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
     }
 
     public void update() throws IOException {
-        player.update(); // Update player state
+        player.update();
+        // Update player state
     }
 
     // To draw something on the screen
@@ -114,6 +115,7 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
         g2.dispose(); // Dispose of this graphics context and release any system resources
     }
 

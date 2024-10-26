@@ -45,7 +45,7 @@ public class Player extends Entity {
 
     public Weapon[] guns = new Weapon[5];
 
-    private List<Bullet> bullets;
+    public static List<Bullet> bullets;
 
     private boolean mousePressed = false; // Track mouse button state
     private MouseHandler mouseHandler;
@@ -148,18 +148,21 @@ public class Player extends Entity {
         // Update bullets
         for (int i = bullets.size() - 1; i >= 0; i--) {
             Bullet bullet = bullets.get(i);
-            if (Collision.checkCollision(bullet.calculateRectangle())) {
-                System.out.println("hit");
-                bullets.remove(i); //the bullet doesn't get removed from
+
+            // Log the bullet's current position before checking collisions
+            System.out.printf("Bullet at position X: %d, Y: %d%n", bullet.x, bullet.y);
+
+            // Check the collision with walls, trees, etc.
+            if (Collision.checkCollision(bullet.calculateRectangle()) ||
+                    bullet.y > 5120 || bullet.x > 5120 || bullet.y < 0 || bullet.x < 0) {
+                System.out.printf("Bullet at X: %d, Y: %d is removed%n", bullet.x, bullet.y);
+                bullets.remove(i); // Remove the bullet when it collides or goes out of bounds
             } else {
-                bullet.update();
+                bullet.update(); // Update bullet's position if no collision
             }
         }
+
     }
-
-
-
-
 
     private boolean isMoving() {
         return keyHandler.pressUp || keyHandler.pressDown || keyHandler.pressLeft || keyHandler.pressRight;
@@ -252,7 +255,7 @@ public class Player extends Entity {
         drawAngleLine(g2, angle, radius, weaponX, weaponY);
 
         // Use a subclass of Gun with an image (e.g., Scar or Rifle)
-        Gun gun = new Scar(); // Or `new Rifle()` depending on the weapon you want
+        Gun gun = new Scar(); // Or new Rifle() depending on the weapon you want
 
         // Correct gun alignment by adjusting its rotation and image rendering
         AffineTransform originalTransform = g2.getTransform();
@@ -275,23 +278,40 @@ public class Player extends Entity {
         drawBounds(g2);
     }
 
-    public void shootBullet() throws IOException {
-            // Bullet start position (just to the right of the gun, at the tip)
-            int bulletX = (int) (screenX + (double) playerWidth / 2 + 85 * Math.cos(angle));
-            int bulletY = (int) (screenY + (double) playerHeight / 2 + 85 * Math.sin(angle));
-
-            // Create and add the bullet
-            bullets.add(new Bullet(bulletX, bulletY, angle));
-    }
-
-    private void shoot() throws IOException {
+    public void shoot() throws IOException {
         long currentTime = System.currentTimeMillis();
         if (currentTime - lastShotTime > shootingDelay) { // shootingDelay in milliseconds
-            int bulletX = (int) (screenX + (double) playerWidth / 2 + 85 * Math.cos(angle));
+            //Calculate the starting position of the bullet
+            int x = screenX;
+            int y = screenY;
+
+            int bulletX = (int) (x + (double) playerWidth / 2 + 85 * Math.cos(angle));
             int bulletY = (int) (screenY + (double) playerHeight / 2 + 85 * Math.sin(angle));
-            bullets.add(new Bullet(bulletX, bulletY, angle)); // Create and add the bullet
+            // Load the bullet image (adjust path if needed)
+            BufferedImage bulletImage = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("object/weapon/bullet/rifle.png")));
+            //Create a bullet with the current angle
+            bullets.add(new Bullet(bulletX, bulletY, angle, bulletImage)); // Create and add the bullet
             lastShotTime = currentTime; // Update last shot time
         }
+    }
+
+    private double calculateAngleToMouse() {
+        // Get player screen position
+        int playerCenterX = screenX + playerWidth / 2;
+        int playerCenterY = screenY + playerHeight / 2;
+
+        // Get mouse position relative to the game panel
+        Point mousePosition = MouseInfoUtil.getMousePosition();
+        int mouseX = mousePosition.x - gamePanel.getLocationOnScreen().x;
+        int mouseY = mousePosition.y - gamePanel.getLocationOnScreen().y;
+
+        // Calculate the angle in radians
+        double angle = Math.atan2(mouseY - playerCenterY, mouseX - playerCenterX);
+
+        // Add 40 degrees offset to correct rifle alignment (convert 45 degrees to radians)
+        double adjustedAngle = angle + Math.toRadians(45);
+
+        return adjustedAngle;
     }
 
 
@@ -387,25 +407,6 @@ public class Player extends Entity {
         //g2.drawRoundRect(screenX + bounds.x, screenY + bounds.y, bounds.width, bounds.height,10,50);
     }
 
-    private double calculateAngleToMouse() {
-        // Get player screen position
-        int playerCenterX = screenX + playerWidth / 2;
-        int playerCenterY = screenY + playerHeight / 2;
-
-        // Get mouse position relative to the game panel
-        Point mousePosition = MouseInfoUtil.getMousePosition();
-        int mouseX = mousePosition.x - gamePanel.getLocationOnScreen().x;
-        int mouseY = mousePosition.y - gamePanel.getLocationOnScreen().y;
-
-        // Calculate the angle in radians
-        double angle = Math.atan2(mouseY - playerCenterY, mouseX - playerCenterX);
-
-        // Add 40 degrees offset to correct rifle alignment (convert 45 degrees to radians)
-        double adjustedAngle = angle + Math.toRadians(45);
-
-        return adjustedAngle;
-    }
-
     public void setMousePressed(boolean mousePressed) {
         this.mousePressed = mousePressed; // Set mouse pressed state
     }
@@ -421,5 +422,8 @@ public class Player extends Entity {
             }
         }
 
+    }
+    public void setMouseHandler(MouseHandler mouseHandler) {
+        this.mouseHandler = mouseHandler;
     }
 }

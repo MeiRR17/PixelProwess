@@ -29,14 +29,7 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
 
     // Handle mouse events (required for MouseListener)
     @Override
-    public void mouseClicked(MouseEvent e) {
-        // Trigger shooting when the mouse is clicked
-        try {
-            player.shootBullet();
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
+    public void mouseClicked(MouseEvent e) {}
 
     @Override
     public void mousePressed(MouseEvent e) {

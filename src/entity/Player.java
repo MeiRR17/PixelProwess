@@ -155,7 +155,7 @@ public class Player extends Entity {
             // Check the collision with walls, trees, etc.
             if (Collision.checkCollision(bullet.calculateRectangle()) ||
                     bullet.y > 5120 || bullet.x > 5120 || bullet.y < 0 || bullet.x < 0) {
-                System.out.printf("Bullet at X: %d, Y: %d is removed%n", bullet.x, bullet.y);
+//                System.out.printf("Bullet at X: %d, Y: %d is removed%n", bullet.x, bullet.y);
                 bullets.remove(i); // Remove the bullet when it collides or goes out of bounds
             } else {
                 bullet.update(); // Update bullet's position if no collision
@@ -221,6 +221,45 @@ public class Player extends Entity {
         playerY += yMultiplier * diagonalSpeed;
         playerX += xMultiplier * diagonalSpeed;
     }
+    private void moveBullet(){
+        double xAngle = 85 * Math.cos(angle);
+        double yAngle = 85 * Math.sin(angle);
+        for (int i = bullets.size() - 1; i >= 0; i--){
+            switch (direction) {
+                case "up" -> {
+                    if (xAngle>0 && yAngle>0) {
+
+                    }
+                    bullets.get(i).y += speed;
+                }
+                case "down" -> {
+                    bullets.get(i).y -= speed;
+                }
+                case "right" -> {
+                bullets.get(i).x -= speed;
+                }
+                case "left" -> {
+                    bullets.get(i).x += speed;
+                }
+                case "up&right" -> {
+                    bullets.get(i).y += speed;
+                    bullets.get(i).x -= speed;
+                }
+                case "up&left" -> {
+                    bullets.get(i).y += speed;
+                    bullets.get(i).x += speed;
+                }
+                case "down&right" -> {
+                    bullets.get(i).y -= speed;
+                    bullets.get(i).x -= speed;
+                }
+                case "down&left" -> {
+                    bullets.get(i).y -= speed;
+                    bullets.get(i).x += speed;
+                }
+            }
+        }
+    }
 
     private void updateSpriteAnimation() {
         spriteCounter++;
@@ -281,15 +320,14 @@ public class Player extends Entity {
     public void shoot() throws IOException {
         long currentTime = System.currentTimeMillis();
         if (currentTime - lastShotTime > shootingDelay) { // shootingDelay in milliseconds
-            //Calculate the starting position of the bullet
-            int x = screenX;
-            int y = screenY;
-
-            int bulletX = (int) (x + (double) playerWidth / 2 + 85 * Math.cos(angle));
+            // Calculate the starting position of the bullet
+            int bulletX = (int) (screenX + (double) playerWidth / 2 + 85 * Math.cos(angle));
             int bulletY = (int) (screenY + (double) playerHeight / 2 + 85 * Math.sin(angle));
+
             // Load the bullet image (adjust path if needed)
             BufferedImage bulletImage = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("object/weapon/bullet/rifle.png")));
-            //Create a bullet with the current angle
+
+            // Create a bullet with the current angle
             bullets.add(new Bullet(bulletX, bulletY, angle, bulletImage)); // Create and add the bullet
             lastShotTime = currentTime; // Update last shot time
         }

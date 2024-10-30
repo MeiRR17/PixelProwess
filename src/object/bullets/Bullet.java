@@ -1,4 +1,4 @@
-package object;
+package object.bullets;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -14,11 +14,14 @@ public class Bullet {
     private BufferedImage image;
     public boolean bulletCollision = false;
 
-    public Bullet(int x, int y, double angle, BufferedImage image) {
+    protected String bulletPath;
+    public BufferedImage bulletImage;
+    public Bullet(String bulletPath, int x, int y, double angle) throws IOException {
+        this.bulletPath = bulletPath;
+        this.bulletImage = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource(this.bulletPath)));
         this.x = x;
         this.y = y;
         this.angle = angle;
-        this.image = image;
     }
 
     public void update() {
@@ -39,6 +42,6 @@ public class Bullet {
     }
 
     public Rectangle calculateRectangle(){
-        return new Rectangle(x,y,10,5);
+        return new Rectangle(x, y, 10, 5);
     }
 }

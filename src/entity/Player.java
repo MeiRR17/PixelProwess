@@ -2,8 +2,7 @@ package entity;
 
 import main.Collision;
 import main.GamePanel;
-import object.*;
-import object.weapons.TacticalAssaultRifle;
+import object.bullets.Bullet;
 import object.weapons.Weapon;
 import utility.KeyHandler;
 import utility.MouseHandler;
@@ -274,8 +273,6 @@ public class Player extends Entity {
         // Calculate the angle between the player and the mouse
         double angle = calculateAngleToMouse();
         double angleOffset = Math.toRadians(-45); // Offset to align the weapon correctly
-
-        // Correct the angle with the offset
         angle += angleOffset;
 
         int radius = 85;
@@ -290,9 +287,6 @@ public class Player extends Entity {
         // Draw the green line extending from the weapon
         drawAngleLine(g2, angle, radius, weaponX, weaponY);
 
-        // Use a subclass of Gun with an image (e.g., Scar or Rifle)
-//        Gun gun = new Scar(); // Or new Rifle() depending on the weapon you want
-
         // Correct gun alignment by adjusting its rotation and image rendering
         AffineTransform originalTransform = g2.getTransform();
 
@@ -302,13 +296,15 @@ public class Player extends Entity {
         // Rotate the gun based on the calculated angle
         g2.rotate(angle);
 
-        // Draw the gun image, adjusting the position so the left side aligns with the player
-//        g2.drawImage(gun.image, -gun.image.getWidth() / 2, -gun.image.getHeight() / 2, null);
-        currentWeapon = new TacticalAssaultRifle();
-        g2.drawImage(currentWeapon.gunImage, -currentWeapon.gunImage.getWidth() / 2, -currentWeapon.gunImage.getHeight() / 2, null);
+        // Draw the current weapon image if it exists
+        if (currentWeapon != null) {
+            g2.drawImage(currentWeapon.gunImage, -currentWeapon.gunImage.getWidth() / 2, -currentWeapon.gunImage.getHeight() / 2, null);
+        }
+
         // Restore the original transform
         g2.setTransform(originalTransform);
 
+        // Draw bullets
         for (Bullet bullet : bullets) {
             bullet.draw(g2); // Draw the bullet
         }
@@ -326,7 +322,7 @@ public class Player extends Entity {
             BufferedImage bulletImage = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("object/weapon/bullet/rifle.png")));
 
             // Create a bullet with the current angle
-            bullets.add(new Bullet(bulletX, bulletY, angle, bulletImage)); // Create and add the bullet
+            bullets.add(new Bullet("object/weapon/bullet/rifle.png", bulletX, bulletY, angle)); // Create and add the bullet
             lastShotTime = currentTime; // Update last shot time
         }
     }
@@ -447,23 +443,23 @@ public class Player extends Entity {
         this.mousePressed = mousePressed; // Set mouse pressed state
     }
 
-    public String pickUpObject (int i) {
-        String equipedWeaponName = "";
+    public void pickUpObject(int i) {
         if (i != 999) {
-            String objectName = gamePanel.weapons[i].weaponName;
-            switch (objectName) {
-                case "tacticalAssaultRifle", "automaticSniper", "ak", "p90", "pistol", "sniper", "scar":
-                    gamePanel.weapons[i] = null;
-                    break;
-                case "shotgun":
-                    equipedWeaponName = "shotgun";
-                    currentWeapon = gamePanel.weapons[i];
-                    System.out.println(currentWeapon.weaponName);
-                    gamePanel.weapons[i] = null;
+            Weapon pickedWeapon = gamePanel.weapons[i]; // Get the weapon object
+            if (pickedWeapon != null) {
+                String objectName = pickedWeapon.weaponName;
+                switch (objectName) {
+                    case "tacticalAssaultRifle", "automaticSniper", "ak", "p90", "pistol", "sniper", "scar", "shotgun":
+                        currentWeapon = pickedWeapon;
+                        gamePanel.weapons[i] = null; // Remove the weapon from the game
+                        break;
+                    default:
+                        currentWeapon = pickedWeapon; // Set current weapon to the picked weapon
+                        gamePanel.weapons[i] = null; // Remove the weapon from the game
+                        break;
+                }
             }
-            equipedWeaponName = gamePanel.weapons[i].weaponName;
         }
-        return equipedWeaponName;
     }
     public void setMouseHandler(MouseHandler mouseHandler) {
         this.mouseHandler = mouseHandler;

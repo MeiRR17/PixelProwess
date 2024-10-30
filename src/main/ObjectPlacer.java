@@ -38,10 +38,6 @@ public class ObjectPlacer {
         gamePanel.weapons[5].worldX = 45 * gamePanel.tileSize;
         gamePanel.weapons[5].worldY = 40 * gamePanel.tileSize;
 
-        gamePanel.weapons[6] = new TacticalAssaultRifle();
-        gamePanel.weapons[6].worldX = 40 * gamePanel.tileSize;
-        gamePanel.weapons[6].worldY = 41 * gamePanel.tileSize;
-
         gamePanel.weapons[7] = new P90();
         gamePanel.weapons[7].worldX = 41 * gamePanel.tileSize;
         gamePanel.weapons[7].worldY = 41 * gamePanel.tileSize;

@@ -150,7 +150,6 @@ public class Collision {
             }
             worldCol++;
             if (worldCol == gamePanel.worldColumn) {
-                if (intersects) {break;}
                 worldCol = 0;
                 worldRow++;
             }
@@ -161,19 +160,19 @@ public class Collision {
     public int checkObject(Entity entity, boolean player) {
         int index = 999;
 
-        for (int i = 0; i < gamePanel.objMaster.length; i++) {
-            if (gamePanel.objMaster[i] != null) {
+        for (int i = 0; i < gamePanel.weapons.length; i++) {
+            if (gamePanel.weapons[i] != null) {
                 entity.bounds.x = entity.playerX + entity.bounds.x;
                 entity.bounds.y = entity.playerY + entity.bounds.y;
                 // Get object's solid area position
-                gamePanel.objMaster[i].bounds.x = gamePanel.objMaster[i].worldX + gamePanel.objMaster[i].bounds.x;
-                gamePanel.objMaster[i].bounds.y = gamePanel.objMaster[i].worldY + gamePanel.objMaster[i].bounds.y;
+                gamePanel.weapons[i].bounds.x = gamePanel.weapons[i].worldX + gamePanel.weapons[i].bounds.x;
+                gamePanel.weapons[i].bounds.y = gamePanel.weapons[i].worldY + gamePanel.weapons[i].bounds.y;
 
                 switch (entity.direction) {
                     case "up":
                         entity.bounds.y -= entity.speed;
-                        if (entity.bounds.intersects(gamePanel.objMaster[i].bounds)) {
-                            if (gamePanel.objMaster[i].collision) {
+                        if (entity.bounds.intersects(gamePanel.weapons[i].bounds)) {
+                            if (gamePanel.weapons[i].collision) {
                                 entity.playerCollision = true;
                             }
                             if (player) {
@@ -183,8 +182,8 @@ public class Collision {
                         break;
                     case "down":
                         entity.bounds.y += entity.speed;
-                        if (entity.bounds.intersects(gamePanel.objMaster[i].bounds)) {
-                            if (gamePanel.objMaster[i].collision) {
+                        if (entity.bounds.intersects(gamePanel.weapons[i].bounds)) {
+                            if (gamePanel.weapons[i].collision) {
                                 entity.playerCollision = true;
                             }
                             if (player) {
@@ -194,8 +193,8 @@ public class Collision {
                         break;
                     case "left":
                         entity.bounds.x -= entity.speed;
-                        if (entity.bounds.intersects(gamePanel.objMaster[i].bounds)) {
-                            if (gamePanel.objMaster[i].collision) {
+                        if (entity.bounds.intersects(gamePanel.weapons[i].bounds)) {
+                            if (gamePanel.weapons[i].collision) {
                                 entity.playerCollision = true;
                             }
                             if (player) {
@@ -205,8 +204,8 @@ public class Collision {
                         break;
                     case "right":
                         entity.bounds.x += entity.speed;
-                        if (entity.bounds.intersects(gamePanel.objMaster[i].bounds)) {
-                            if (gamePanel.objMaster[i].collision) {
+                        if (entity.bounds.intersects(gamePanel.weapons[i].bounds)) {
+                            if (gamePanel.weapons[i].collision) {
                                 entity.playerCollision = true;
                             }
                             if (player) {
@@ -217,8 +216,8 @@ public class Collision {
                 }
                 entity.bounds.x = entity.solidAreaDefaultX;
                 entity.bounds.y = entity.solidAreaDefaultY;
-                gamePanel.objMaster[i].bounds.x = gamePanel.objMaster[i].solidAreaDefaultX;
-                gamePanel.objMaster[i].bounds.y = gamePanel.objMaster[i].solidAreaDefaultY;
+                gamePanel.weapons[i].bounds.x = gamePanel.weapons[i].solidAreaDefaultX;
+                gamePanel.weapons[i].bounds.y = gamePanel.weapons[i].solidAreaDefaultY;
             }
         }
         return index;

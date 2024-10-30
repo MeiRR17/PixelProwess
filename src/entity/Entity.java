@@ -18,4 +18,5 @@ public class Entity {
     public Rectangle bounds;
     public int solidAreaDefaultX, solidAreaDefaultY;
     public boolean playerCollision = false;//default
+    public int worldX, worldY; // Position in the game world
 }

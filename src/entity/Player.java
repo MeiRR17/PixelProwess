@@ -2,11 +2,10 @@ package entity;
 
 import main.Collision;
 import main.GamePanel;
-import object.Gun;
+import object.*;
+import object.weapons.TacticalAssaultRifle;
+import object.weapons.Weapon;
 import utility.KeyHandler;
-import object.Bullet;
-import object.Weapon;
-import object.Scar;
 import utility.MouseHandler;
 import utility.MouseInfoUtil;
 
@@ -40,7 +39,7 @@ public class Player extends Entity {
     public final int playerWidth;
     public final int playerHeight;
 
-    private static final int BOUND_WIDTH = 31;
+    private static final int BOUND_WIDTH = 30;
     private static final int BOUND_HEIGHT = 30;
 
     public Weapon[] guns = new Weapon[5];
@@ -51,6 +50,8 @@ public class Player extends Entity {
     private MouseHandler mouseHandler;
     private long lastShotTime = 0; // Tracks the last time a shot was fired
     private final long shootingDelay = 200; // Shooting delay in milliseconds
+
+    public Weapon currentWeapon;
 
 
     public Player(GamePanel gamePanel, KeyHandler keyHandler, MouseHandler mouseHandler) throws IOException {
@@ -77,8 +78,8 @@ public class Player extends Entity {
     }
 
     private void setDefaultValues() {
-        playerX = gamePanel.tileSize * 23;
-        playerY = gamePanel.tileSize * 23;
+        playerX = gamePanel.tileSize * 38;
+        playerY = gamePanel.tileSize * 38;
         speed = SPEED;
         direction = "down";
     }
@@ -155,7 +156,6 @@ public class Player extends Entity {
             // Check the collision with walls, trees, etc.
             if (Collision.checkCollision(bullet.calculateRectangle()) ||
                     bullet.y > 5120 || bullet.x > 5120 || bullet.y < 0 || bullet.x < 0) {
-//                System.out.printf("Bullet at X: %d, Y: %d is removed%n", bullet.x, bullet.y);
                 bullets.remove(i); // Remove the bullet when it collides or goes out of bounds
             } else {
                 bullet.update(); // Update bullet's position if no collision
@@ -224,12 +224,9 @@ public class Player extends Entity {
     private void moveBullet(){
         double xAngle = 85 * Math.cos(angle);
         double yAngle = 85 * Math.sin(angle);
-        for (int i = bullets.size() - 1; i >= 0; i--){
+        for (int i = 0; i < bullets.size() - 1; i++){
             switch (direction) {
                 case "up" -> {
-                    if (xAngle>0 && yAngle>0) {
-
-                    }
                     bullets.get(i).y += speed;
                 }
                 case "down" -> {
@@ -294,7 +291,7 @@ public class Player extends Entity {
         drawAngleLine(g2, angle, radius, weaponX, weaponY);
 
         // Use a subclass of Gun with an image (e.g., Scar or Rifle)
-        Gun gun = new Scar(); // Or new Rifle() depending on the weapon you want
+//        Gun gun = new Scar(); // Or new Rifle() depending on the weapon you want
 
         // Correct gun alignment by adjusting its rotation and image rendering
         AffineTransform originalTransform = g2.getTransform();
@@ -306,8 +303,9 @@ public class Player extends Entity {
         g2.rotate(angle);
 
         // Draw the gun image, adjusting the position so the left side aligns with the player
-        g2.drawImage(gun.image, -gun.image.getWidth() / 2, -gun.image.getHeight() / 2, null);
-
+//        g2.drawImage(gun.image, -gun.image.getWidth() / 2, -gun.image.getHeight() / 2, null);
+        currentWeapon = new TacticalAssaultRifle();
+        g2.drawImage(currentWeapon.gunImage, -currentWeapon.gunImage.getWidth() / 2, -currentWeapon.gunImage.getHeight() / 2, null);
         // Restore the original transform
         g2.setTransform(originalTransform);
 
@@ -449,17 +447,23 @@ public class Player extends Entity {
         this.mousePressed = mousePressed; // Set mouse pressed state
     }
 
-    public void pickUpObject (int i) {
+    public String pickUpObject (int i) {
+        String equipedWeaponName = "";
         if (i != 999) {
-            String objectName = gamePanel.objMaster[i].name;
-
+            String objectName = gamePanel.weapons[i].weaponName;
             switch (objectName) {
-                case "pistol":
-                    gamePanel.objMaster[i] = null;
+                case "tacticalAssaultRifle", "automaticSniper", "ak", "p90", "pistol", "sniper", "scar":
+                    gamePanel.weapons[i] = null;
                     break;
+                case "shotgun":
+                    equipedWeaponName = "shotgun";
+                    currentWeapon = gamePanel.weapons[i];
+                    System.out.println(currentWeapon.weaponName);
+                    gamePanel.weapons[i] = null;
             }
+            equipedWeaponName = gamePanel.weapons[i].weaponName;
         }
-
+        return equipedWeaponName;
     }
     public void setMouseHandler(MouseHandler mouseHandler) {
         this.mouseHandler = mouseHandler;

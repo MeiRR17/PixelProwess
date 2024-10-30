@@ -17,27 +17,27 @@ public class KeyHandler implements KeyListener {
         int keyCode = e.getKeyCode();
 
         // W for up
-        if(keyCode == KeyEvent.VK_W) {
+        if (keyCode == KeyEvent.VK_W) {
             pressUp = true;
         }
 
         // S for down
-        if(keyCode == KeyEvent.VK_S) {
+        if (keyCode == KeyEvent.VK_S) {
             pressDown = true;
         }
 
         // D for right
-        if(keyCode == KeyEvent.VK_D) {
+        if (keyCode == KeyEvent.VK_D) {
             pressRight = true;
         }
 
         // A for left
-        if(keyCode == KeyEvent.VK_A) {
+        if (keyCode == KeyEvent.VK_A) {
             pressLeft = true;
         }
 
-        // Space for shooting
-        if(keyCode == KeyEvent.VK_SPACE) {
+        // E for picking up items
+        if (keyCode == KeyEvent.VK_E) {
             pressSpace = true;
         }
     }
@@ -47,27 +47,27 @@ public class KeyHandler implements KeyListener {
         int keyCode = e.getKeyCode();
 
         // W for up
-        if(keyCode == KeyEvent.VK_W) {
+        if (keyCode == KeyEvent.VK_W) {
             pressUp = false;
         }
 
         // S for down
-        if(keyCode == KeyEvent.VK_S) {
+        if (keyCode == KeyEvent.VK_S) {
             pressDown = false;
         }
 
         // D for right
-        if(keyCode == KeyEvent.VK_D) {
+        if (keyCode == KeyEvent.VK_D) {
             pressRight = false;
         }
 
         // A for left
-        if(keyCode == KeyEvent.VK_A) {
+        if (keyCode == KeyEvent.VK_A) {
             pressLeft = false;
         }
 
-        // Space for shooting
-        if(keyCode == KeyEvent.VK_SPACE) {
+        // E for picking up items
+        if (keyCode == KeyEvent.VK_E) {
             pressSpace = false;
         }
     }

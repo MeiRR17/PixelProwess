@@ -2,6 +2,7 @@ package main;
 
 import entity.Player;
 import object.ObjMaster;
+import object.weapons.Weapon;
 import tile.TileManager;
 import utility.KeyHandler;
 import utility.MouseHandler;
@@ -37,6 +38,7 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
     public ObjectPlacer objectPlacer = new ObjectPlacer(this);
     public Player player = new Player(this, keyHandler, null);
     public ObjMaster[] objMaster = new ObjMaster[25];
+    public Weapon[] weapons = new Weapon[25];
 
 
     public GamePanel() throws IOException {
@@ -107,6 +109,12 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
         for (ObjMaster master : objMaster) {
             if (master != null) {
                 master.draw(g2, this);
+            }
+        }
+
+        for (Weapon weapon: weapons) {
+            if(weapon != null) {
+                weapon.draw(g2, this);
             }
         }
         // Layer 3

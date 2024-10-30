@@ -12,9 +12,7 @@ public class Gun {
     public int worldX;
     public int worldY;
 
-    // Method to draw the gun
-    // Method to draw the gun
-    // Method to draw the gun
+
     public void draw(Graphics2D g2, GamePanel gamePanel, double angle, int playerCenterX, int playerCenterY) {
         if (image == null) {
             // Handle null image case

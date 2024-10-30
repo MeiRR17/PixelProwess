@@ -1,8 +1,6 @@
 package entity;
 
-import object.Rifle;
-import object.Scar;
-import object.Weapon;
+import object.weapons.Weapon;
 
 import java.io.IOException;
 import java.util.Random;

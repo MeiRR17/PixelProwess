@@ -1,11 +1,13 @@
 package main;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Objects;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-
         JFrame window = new JFrame();
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //Sets the operation that will happen by default when the user initiates a "close" on this frame. You must specify one of the following choices:
         window.setResizable(false); // Sets whether this frame is resizable by the user.

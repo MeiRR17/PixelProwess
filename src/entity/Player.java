@@ -136,6 +136,9 @@ public class Player extends Entity {
             int objIndex = gamePanel.collisionCheck.checkObject(this, true);
             pickUpObject(objIndex);
             updateSpriteAnimation();
+            if (!bullets.isEmpty()){
+                moveBullet();
+            }
         } else {
             spriteNumber = 1; // Reset to standing sprite
         }
@@ -226,13 +229,31 @@ public class Player extends Entity {
         for (int i = 0; i < bullets.size() - 1; i++){
             switch (direction) {
                 case "up" -> {
-                    bullets.get(i).y += speed;
+                    if((xAngle>-85 || xAngle<85)&& yAngle>0){
+                        bullets.get(i).y++;
+                    }
+                    if ((xAngle>-85 || xAngle<-30 ) && (yAngle>-55 || yAngle<0)){
+                        bullets.get(i).x--;
+                    }
+                    if ((xAngle>30|| xAngle<85) && (yAngle>-55 || yAngle<0) ){
+                        bullets.get(i).x++;
+                    }
                 }
                 case "down" -> {
-                    bullets.get(i).y -= speed;
+                    if((xAngle>-85 || xAngle<85)&& yAngle<0){
+                        bullets.get(i).y--;
+                    }
+                    if ((xAngle>-85 || xAngle<-30 ) && (yAngle>55 || yAngle>0)){
+                        bullets.get(i).x--;
+                    }
+                    if ((xAngle>30|| xAngle<85) && (yAngle>55 || yAngle>0) ){
+                        bullets.get(i).x++;
+                    }
                 }
                 case "right" -> {
-                bullets.get(i).x -= speed;
+                    if((yAngle>-85 || yAngle<85)&& yAngle<0){
+                        bullets.get(i).y++;
+                    }
                 }
                 case "left" -> {
                     bullets.get(i).x += speed;

@@ -32,7 +32,6 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
     TileManager tileManager = new TileManager(this);
 
     KeyHandler keyHandler = new KeyHandler();
-    private MouseHandler mouseHandler;
     Thread gameThread;
     public Collision collisionCheck = new Collision(this);
     public ObjectPlacer objectPlacer = new ObjectPlacer(this);
@@ -47,7 +46,7 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
         this.setDoubleBuffered(true); // Set this component to be double buffered
         this.addKeyListener(keyHandler);
         this.setFocusable(true); // Make the GamePanel receive key input
-        mouseHandler = new MouseHandler(player);
+        MouseHandler mouseHandler = new MouseHandler(player);
         this.addMouseListener(mouseHandler);
         this.addMouseMotionListener(this); // Add the mouse motion listener
         player = new Player(this, keyHandler, mouseHandler); // Updated line

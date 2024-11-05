@@ -6,11 +6,9 @@ import java.io.IOException;
 import java.util.Random;
 
 public class PickGun {
-    private final Player player;
     private final Random random;
 
-    public PickGun(Player player) {
-        this.player = player;
+    public PickGun() {
         this.random = new Random();
     }
 

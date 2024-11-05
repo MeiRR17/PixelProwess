@@ -1,10 +1,6 @@
 package object.weapons;
 
-import object.Gun;
-
-import javax.imageio.ImageIO;
 import java.io.IOException;
-import java.util.Objects;
 
 public class Scar extends Weapon {
     public Scar() throws IOException {

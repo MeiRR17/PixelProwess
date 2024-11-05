@@ -66,7 +66,7 @@ public class Player extends Entity {
         playerHeight = (int) (gamePanel.tileSize * 1.45);
 
         this.bounds = new Rectangle(32, 51, BOUND_WIDTH, BOUND_HEIGHT);
-        PickGun pickGun = new PickGun(this);
+        PickGun pickGun = new PickGun();
         pickGun.getGun();
 
         solidAreaDefaultX = bounds.x;

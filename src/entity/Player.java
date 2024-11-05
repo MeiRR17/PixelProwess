@@ -137,7 +137,7 @@ public class Player extends Entity {
             int objIndex = gamePanel.collisionCheck.checkObject(this, true);
             pickUpObject(objIndex);
             updateSpriteAnimation();
-            if (!bullets.isEmpty()&& !playerCollision){
+            if (!bullets.isEmpty()){
                 moveBullet();
             }
         } else {
@@ -145,7 +145,7 @@ public class Player extends Entity {
         }
 
         //check if shooting
-        if (mouseHandler.isShooting()) {
+        if (currentBullet != null && mouseHandler.isShooting()) {
             shoot(); // Call shoot method
         }
 
@@ -239,6 +239,7 @@ public class Player extends Entity {
                     if ((xAngle>30|| xAngle<85) && (yAngle>-55 || yAngle<0) ){
                         bullets.get(i).x++;
                     }
+                    bullets.get(i).y++;
                 }
                 case "down" -> {
                     if((xAngle>-85 || xAngle<85)&& yAngle<0){

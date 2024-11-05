@@ -13,6 +13,7 @@ public abstract class Weapon {
     protected String iconImagePath; // Image used as tile icon
     protected String bulletPath;
     public BufferedImage gunImage;
+    public double scale;
     public BufferedImage iconImage;
     public BufferedImage bulletImage;
     public String weaponName;
@@ -28,13 +29,15 @@ public abstract class Weapon {
     public double FIRE_RATE;
     public double RELOAD_TIME;
 
-    public Weapon(String gunImagePath, String iconImagePath, String weaponName, String bulletPath, int DAMAGE, int MAGAZINE_SIZE, double FIRE_RATE, double RELOAD_TIME) throws IOException {
+    public Weapon(String gunImagePath, double scale, String iconImagePath, String weaponName, String bulletPath, int DAMAGE, int MAGAZINE_SIZE, double FIRE_RATE, double RELOAD_TIME) throws IOException {
         this.gunImagePath = gunImagePath;
+        this.scale = scale;
         this.iconImagePath = iconImagePath;
         this.weaponName = weaponName;
         this.bulletPath = bulletPath;
         this.gunImage = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource(this.gunImagePath)));
-        this.iconImage = resizeImage(ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource(iconImagePath))), 32, 32);
+        this.gunImage = resizeImage(ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource(this.gunImagePath))), (int) this.scale * gunImage.getWidth(), (int) this.scale * gunImage.getHeight());
+        this.iconImage = resizeImage(ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource(iconImagePath))));
         this.bulletImage = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource(this.bulletPath)));
         this.DAMAGE = DAMAGE;
         this.MAGAZINE_SIZE = MAGAZINE_SIZE;
@@ -60,6 +63,18 @@ public abstract class Weapon {
         // Draw the original image to the resized image
         Graphics2D g2d = resizedImage.createGraphics();
         g2d.drawImage(image.getScaledInstance(width, height, Image.SCALE_SMOOTH), 0, 0, null);
+        g2d.dispose();
+
+        return resizedImage;
+    }
+
+    protected BufferedImage resizeImage(BufferedImage image) {
+        // Create a new BufferedImage with the desired dimensions
+        BufferedImage resizedImage = new BufferedImage(32, 32, BufferedImage.TYPE_INT_ARGB);
+
+        // Draw the original image to the resized image
+        Graphics2D g2d = resizedImage.createGraphics();
+        g2d.drawImage(image.getScaledInstance(32, 32, Image.SCALE_SMOOTH), 0, 0, null);
         g2d.dispose();
 
         return resizedImage;

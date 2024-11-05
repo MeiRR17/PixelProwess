@@ -1,11 +1,8 @@
 package object.bullets;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.Objects;
 
 public class Bullet {
     public int x, y;
@@ -13,9 +10,6 @@ public class Bullet {
     public final int speed = 3;
     public BufferedImage image;
     public boolean bulletCollision = false;
-
-    protected String bulletPath;
-    public BufferedImage bulletImage;
 
     public Bullet(int x, int y, double angle, BufferedImage image) {
         this.x = x;

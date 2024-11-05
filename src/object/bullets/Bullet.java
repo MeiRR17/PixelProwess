@@ -10,18 +10,18 @@ import java.util.Objects;
 public class Bullet {
     public int x, y;
     public double angle; // Direction of the bullet
-    public final int speed = 10;
-    private BufferedImage image;
+    public final int speed = 3;
+    public BufferedImage image;
     public boolean bulletCollision = false;
 
     protected String bulletPath;
     public BufferedImage bulletImage;
-    public Bullet(String bulletPath, int x, int y, double angle) throws IOException {
-        this.bulletPath = bulletPath;
-        this.bulletImage = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource(this.bulletPath)));
+
+    public Bullet(int x, int y, double angle, BufferedImage image) {
         this.x = x;
         this.y = y;
         this.angle = angle;
+        this.image = image;
     }
 
     public void update() {

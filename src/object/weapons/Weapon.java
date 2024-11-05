@@ -11,8 +11,10 @@ import java.util.Objects;
 public abstract class Weapon {
     protected String gunImagePath;  // Image used in-game
     protected String iconImagePath; // Image used as tile icon
+    protected String bulletPath;
     public BufferedImage gunImage;
     public BufferedImage iconImage;
+    public BufferedImage bulletImage;
     public String weaponName;
     public boolean collision;
     public int worldX, worldY;
@@ -26,13 +28,14 @@ public abstract class Weapon {
     public double FIRE_RATE;
     public double RELOAD_TIME;
 
-    public Weapon(String gunImagePath, String iconImagePath, String weaponName, boolean collision, int DAMAGE, int MAGAZINE_SIZE, double FIRE_RATE, double RELOAD_TIME) throws IOException {
+    public Weapon(String gunImagePath, String iconImagePath, String weaponName, String bulletPath, int DAMAGE, int MAGAZINE_SIZE, double FIRE_RATE, double RELOAD_TIME) throws IOException {
         this.gunImagePath = gunImagePath;
         this.iconImagePath = iconImagePath;
         this.weaponName = weaponName;
+        this.bulletPath = bulletPath;
         this.gunImage = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource(this.gunImagePath)));
         this.iconImage = resizeImage(ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource(iconImagePath))), 32, 32);
-        this.collision = collision;
+        this.bulletImage = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource(this.bulletPath)));
         this.DAMAGE = DAMAGE;
         this.MAGAZINE_SIZE = MAGAZINE_SIZE;
         this.FIRE_RATE = FIRE_RATE;

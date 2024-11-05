@@ -51,6 +51,7 @@ public class Player extends Entity {
     private final long shootingDelay = 200; // Shooting delay in milliseconds
 
     public Weapon currentWeapon;
+    public BufferedImage currentBullet;
 
 
     public Player(GamePanel gamePanel, KeyHandler keyHandler, MouseHandler mouseHandler) throws IOException {
@@ -136,7 +137,7 @@ public class Player extends Entity {
             int objIndex = gamePanel.collisionCheck.checkObject(this, true);
             pickUpObject(objIndex);
             updateSpriteAnimation();
-            if (!bullets.isEmpty()){
+            if (!bullets.isEmpty()&& !playerCollision){
                 moveBullet();
             }
         } else {
@@ -251,12 +252,26 @@ public class Player extends Entity {
                     }
                 }
                 case "right" -> {
-                    if((yAngle>-85 || yAngle<85)&& yAngle<0){
+                    if((yAngle>-85 || yAngle<85)&& xAngle<0){
+                        bullets.get(i).x--;
+                    }
+                    if((yAngle>-85 || yAngle<-30) && xAngle>0){
+                        bullets.get(i).y--;
+                    }
+                    if((yAngle<85 || yAngle>30) && xAngle>0){
                         bullets.get(i).y++;
                     }
                 }
                 case "left" -> {
-                    bullets.get(i).x += speed;
+                    if((yAngle>-85 || yAngle<85)&& xAngle<0){
+                        bullets.get(i).x++;
+                    }
+                    if((yAngle>-85 || yAngle<-30) && xAngle>0){
+                        bullets.get(i).y--;
+                    }
+                    if((yAngle<85 || yAngle>30) && xAngle>0){
+                        bullets.get(i).y++;
+                    }
                 }
                 case "up&right" -> {
                     bullets.get(i).y += speed;
@@ -338,12 +353,10 @@ public class Player extends Entity {
             // Calculate the starting position of the bullet
             int bulletX = (int) (screenX + (double) playerWidth / 2 + 85 * Math.cos(angle));
             int bulletY = (int) (screenY + (double) playerHeight / 2 + 85 * Math.sin(angle));
-
-            // Load the bullet image (adjust path if needed)
-            BufferedImage bulletImage = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("object/weapon/bullet/rifle.png")));
+            BufferedImage bulletImage = currentBullet;
 
             // Create a bullet with the current angle
-            bullets.add(new Bullet("object/weapon/bullet/rifle.png", bulletX, bulletY, angle)); // Create and add the bullet
+            bullets.add(new Bullet(bulletX, bulletY, angle, bulletImage)); // Create and add the bullet
             lastShotTime = currentTime; // Update last shot time
         }
     }
@@ -472,10 +485,12 @@ public class Player extends Entity {
                 switch (objectName) {
                     case "tacticalAssaultRifle", "automaticSniper", "ak", "p90", "pistol", "sniper", "scar", "shotgun":
                         currentWeapon = pickedWeapon;
+                        currentBullet = gamePanel.weapons[i].bulletImage;
                         gamePanel.weapons[i] = null; // Remove the weapon from the game
                         break;
                     default:
                         currentWeapon = pickedWeapon; // Set current weapon to the picked weapon
+                        currentBullet = gamePanel.weapons[i].bulletImage;
                         gamePanel.weapons[i] = null; // Remove the weapon from the game
                         break;
                 }

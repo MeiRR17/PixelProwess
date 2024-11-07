@@ -137,7 +137,7 @@ public class Player extends Entity {
             int objIndex = gamePanel.collisionCheck.checkObject(this, true);
             pickUpObject(objIndex);
             updateSpriteAnimation();
-            if (!bullets.isEmpty()){
+            if (!bullets.isEmpty()&& !playerCollision){
                 moveBullet();
             }
         } else {
@@ -227,52 +227,22 @@ public class Player extends Entity {
     private void moveBullet(){
         double xAngle = 85 * Math.cos(angle);
         double yAngle = 85 * Math.sin(angle);
-        for (int i = 0; i < bullets.size() - 1; i++){
+        for (int i = bullets.size() - 1; i >= 0; i--){
             switch (direction) {
                 case "up" -> {
-                    if((xAngle>-85 || xAngle<85)&& yAngle>0){
+                    if ((yAngle>0||yAngle<85) && (xAngle>0||xAngle<85)){
                         bullets.get(i).y++;
                     }
-                    if ((xAngle>-85 || xAngle<-30 ) && (yAngle>-55 || yAngle<0)){
-                        bullets.get(i).x--;
-                    }
-                    if ((xAngle>30|| xAngle<85) && (yAngle>-55 || yAngle<0) ){
-                        bullets.get(i).x++;
-                    }
-                    bullets.get(i).y++;
+                    bullets.get(i).y += speed;
                 }
                 case "down" -> {
-                    if((xAngle>-85 || xAngle<85)&& yAngle<0){
-                        bullets.get(i).y--;
-                    }
-                    if ((xAngle>-85 || xAngle<-30 ) && (yAngle>55 || yAngle>0)){
-                        bullets.get(i).x--;
-                    }
-                    if ((xAngle>30|| xAngle<85) && (yAngle>55 || yAngle>0) ){
-                        bullets.get(i).x++;
-                    }
+                    bullets.get(i).y -= speed;
                 }
                 case "right" -> {
-                    if((yAngle>-85 || yAngle<85)&& xAngle<0){
-                        bullets.get(i).x--;
-                    }
-                    if((yAngle>-85 || yAngle<-30) && xAngle>0){
-                        bullets.get(i).y--;
-                    }
-                    if((yAngle<85 || yAngle>30) && xAngle>0){
-                        bullets.get(i).y++;
-                    }
+                    bullets.get(i).x -= speed;
                 }
                 case "left" -> {
-                    if((yAngle>-85 || yAngle<85)&& xAngle<0){
-                        bullets.get(i).x++;
-                    }
-                    if((yAngle>-85 || yAngle<-30) && xAngle>0){
-                        bullets.get(i).y--;
-                    }
-                    if((yAngle<85 || yAngle>30) && xAngle>0){
-                        bullets.get(i).y++;
-                    }
+                    bullets.get(i).x += speed;
                 }
                 case "up&right" -> {
                     bullets.get(i).y += speed;
@@ -293,7 +263,6 @@ public class Player extends Entity {
             }
         }
     }
-
     private void updateSpriteAnimation() {
         spriteCounter++;
         if (spriteCounter > 7) {

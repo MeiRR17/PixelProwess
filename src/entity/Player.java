@@ -137,7 +137,7 @@ public class Player extends Entity {
             int objIndex = gamePanel.collisionCheck.checkObject(this, true);
             pickUpObject(objIndex);
             updateSpriteAnimation();
-            if (!bullets.isEmpty()&& !playerCollision){
+            if (!bullets.isEmpty() && !playerCollision){
                 moveBullet();
             }
         } else {
@@ -225,7 +225,6 @@ public class Player extends Entity {
         playerX += xMultiplier * diagonalSpeed;
     }
     private void moveBullet(){
-        double adjustedSpeed = speed / Math.sqrt(2);
         for (int i = bullets.size() - 1; i >= 0; i--){
             switch (direction) {
                 case "up" -> {
@@ -233,7 +232,6 @@ public class Player extends Entity {
                 }
                 case "down" -> {
                     bullets.get(i).y -= speed;
-
                 }
                 case "right" -> {
                     bullets.get(i).x -= speed;
@@ -242,20 +240,20 @@ public class Player extends Entity {
                     bullets.get(i).x += speed;
                 }
                 case "up&right" -> {
-                    bullets.get(i).y += adjustedSpeed;
-                    bullets.get(i).x -= adjustedSpeed;
+                    bullets.get(i).y += speed;
+                    bullets.get(i).x -= speed;
                 }
                 case "up&left" -> {
-                    bullets.get(i).y += adjustedSpeed;
-                    bullets.get(i).x += adjustedSpeed;
+                    bullets.get(i).y += speed;
+                    bullets.get(i).x += speed;
                 }
                 case "down&right" -> {
-                    bullets.get(i).y -= adjustedSpeed;
-                    bullets.get(i).x -= adjustedSpeed;
+                    bullets.get(i).y -= speed;
+                    bullets.get(i).x -= speed;
                 }
                 case "down&left" -> {
-                    bullets.get(i).y -= adjustedSpeed;
-                    bullets.get(i).x += adjustedSpeed;
+                    bullets.get(i).y -= speed;
+                    bullets.get(i).x += speed;
                 }
             }
         }
@@ -279,7 +277,7 @@ public class Player extends Entity {
         double angleOffset = Math.toRadians(-45); // Offset to align the weapon correctly
         angle += angleOffset;
 
-        int radius = 70;
+        int radius = 85;
 
         // Calculate the weapon's position using the adjusted angle and radius
         int weaponX = (int) (screenX + (double) playerWidth / 2 + radius * Math.cos(angle));

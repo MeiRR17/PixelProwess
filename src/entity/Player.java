@@ -137,7 +137,7 @@ public class Player extends Entity {
             int objIndex = gamePanel.collisionCheck.checkObject(this, true);
             pickUpObject(objIndex);
             updateSpriteAnimation();
-            if (!bullets.isEmpty()){
+            if (!bullets.isEmpty()&& !playerCollision){
                 moveBullet();
             }
         } else {
@@ -225,70 +225,37 @@ public class Player extends Entity {
         playerX += xMultiplier * diagonalSpeed;
     }
     private void moveBullet(){
-        double xAngle = 85 * Math.cos(angle);
-        double yAngle = 85 * Math.sin(angle);
-        for (int i = 0; i < bullets.size() - 1; i++){
+        double adjustedSpeed = speed / Math.sqrt(2);
+        for (int i = bullets.size() - 1; i >= 0; i--){
             switch (direction) {
                 case "up" -> {
-                    if((xAngle>-85 || xAngle<85)&& yAngle>0){
-                        bullets.get(i).y++;
-                    }
-                    if ((xAngle>-85 || xAngle<-30 ) && (yAngle>-55 || yAngle<0)){
-                        bullets.get(i).x--;
-                    }
-                    if ((xAngle>30|| xAngle<85) && (yAngle>-55 || yAngle<0) ){
-                        bullets.get(i).x++;
-                    }
-                    bullets.get(i).y++;
+                    bullets.get(i).y += speed;
                 }
                 case "down" -> {
-                    if((xAngle>-85 || xAngle<85)&& yAngle<0){
-                        bullets.get(i).y--;
-                    }
-                    if ((xAngle>-85 || xAngle<-30 ) && (yAngle>55 || yAngle>0)){
-                        bullets.get(i).x--;
-                    }
-                    if ((xAngle>30|| xAngle<85) && (yAngle>55 || yAngle>0) ){
-                        bullets.get(i).x++;
-                    }
+                    bullets.get(i).y -= speed;
+
                 }
                 case "right" -> {
-                    if((yAngle>-85 || yAngle<85)&& xAngle<0){
-                        bullets.get(i).x--;
-                    }
-                    if((yAngle>-85 || yAngle<-30) && xAngle>0){
-                        bullets.get(i).y--;
-                    }
-                    if((yAngle<85 || yAngle>30) && xAngle>0){
-                        bullets.get(i).y++;
-                    }
+                    bullets.get(i).x -= speed;
                 }
                 case "left" -> {
-                    if((yAngle>-85 || yAngle<85)&& xAngle<0){
-                        bullets.get(i).x++;
-                    }
-                    if((yAngle>-85 || yAngle<-30) && xAngle>0){
-                        bullets.get(i).y--;
-                    }
-                    if((yAngle<85 || yAngle>30) && xAngle>0){
-                        bullets.get(i).y++;
-                    }
+                    bullets.get(i).x += speed;
                 }
                 case "up&right" -> {
-                    bullets.get(i).y += speed;
-                    bullets.get(i).x -= speed;
+                    bullets.get(i).y += adjustedSpeed;
+                    bullets.get(i).x -= adjustedSpeed;
                 }
                 case "up&left" -> {
-                    bullets.get(i).y += speed;
-                    bullets.get(i).x += speed;
+                    bullets.get(i).y += adjustedSpeed;
+                    bullets.get(i).x += adjustedSpeed;
                 }
                 case "down&right" -> {
-                    bullets.get(i).y -= speed;
-                    bullets.get(i).x -= speed;
+                    bullets.get(i).y -= adjustedSpeed;
+                    bullets.get(i).x -= adjustedSpeed;
                 }
                 case "down&left" -> {
-                    bullets.get(i).y -= speed;
-                    bullets.get(i).x += speed;
+                    bullets.get(i).y -= adjustedSpeed;
+                    bullets.get(i).x += adjustedSpeed;
                 }
             }
         }
@@ -312,7 +279,7 @@ public class Player extends Entity {
         double angleOffset = Math.toRadians(-45); // Offset to align the weapon correctly
         angle += angleOffset;
 
-        int radius = 85;
+        int radius = 70;
 
         // Calculate the weapon's position using the adjusted angle and radius
         int weaponX = (int) (screenX + (double) playerWidth / 2 + radius * Math.cos(angle));

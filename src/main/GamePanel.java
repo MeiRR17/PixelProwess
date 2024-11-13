@@ -27,6 +27,7 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
 
     public final int worldColumn = 80;
     public final int worldRow = 80;
+    private int something = Toolkit.getDefaultToolkit().getScreenResolution();
 
     int FPS = 60;
     TileManager tileManager = new TileManager(this);
@@ -50,6 +51,7 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
         this.addMouseListener(mouseHandler);
         this.addMouseMotionListener(this); // Add the mouse motion listener
         player = new Player(this, keyHandler, mouseHandler); // Updated line
+        System.out.println(something);
     }
 
     public void gameSet() throws IOException {

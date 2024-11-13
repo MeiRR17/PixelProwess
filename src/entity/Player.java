@@ -225,6 +225,7 @@ public class Player extends Entity {
         playerX += xMultiplier * diagonalSpeed;
     }
     private void moveBullet(){
+        double adjustedSpeed = speed / Math.sqrt(2);
         for (int i = bullets.size() - 1; i >= 0; i--){
             switch (direction) {
                 case "up" -> {
@@ -232,6 +233,7 @@ public class Player extends Entity {
                 }
                 case "down" -> {
                     bullets.get(i).y -= speed;
+
                 }
                 case "right" -> {
                     bullets.get(i).x -= speed;
@@ -240,20 +242,20 @@ public class Player extends Entity {
                     bullets.get(i).x += speed;
                 }
                 case "up&right" -> {
-                    bullets.get(i).y += speed;
-                    bullets.get(i).x -= speed;
+                    bullets.get(i).y += adjustedSpeed;
+                    bullets.get(i).x -= adjustedSpeed;
                 }
                 case "up&left" -> {
-                    bullets.get(i).y += speed;
-                    bullets.get(i).x += speed;
+                    bullets.get(i).y += adjustedSpeed;
+                    bullets.get(i).x += adjustedSpeed;
                 }
                 case "down&right" -> {
-                    bullets.get(i).y -= speed;
-                    bullets.get(i).x -= speed;
+                    bullets.get(i).y -= adjustedSpeed;
+                    bullets.get(i).x -= adjustedSpeed;
                 }
                 case "down&left" -> {
-                    bullets.get(i).y -= speed;
-                    bullets.get(i).x += speed;
+                    bullets.get(i).y -= adjustedSpeed;
+                    bullets.get(i).x += adjustedSpeed;
                 }
             }
         }

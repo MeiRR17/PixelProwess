@@ -27,6 +27,7 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
 
     public final int worldColumn = 80;
     public final int worldRow = 80;
+    private int something = Toolkit.getDefaultToolkit().getScreenResolution();
 
     int FPS = 60;
     TileManager tileManager = new TileManager(this);
@@ -36,7 +37,6 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
     public Collision collisionCheck = new Collision(this);
     public ObjectPlacer objectPlacer = new ObjectPlacer(this);
     public Player player = new Player(this, keyHandler, null);
-    public ObjMaster[] objMaster = new ObjMaster[25];
     public Weapon[] weapons = new Weapon[25];
 
 
@@ -50,6 +50,7 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
         this.addMouseListener(mouseHandler);
         this.addMouseMotionListener(this); // Add the mouse motion listener
         player = new Player(this, keyHandler, mouseHandler); // Updated line
+        System.out.println(something);
     }
 
     public void gameSet() throws IOException {
@@ -105,12 +106,6 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
         // Layer 1
         tileManager.draw(g2);
         // Layer 2
-        for (ObjMaster master : objMaster) {
-            if (master != null) {
-                master.draw(g2, this);
-            }
-        }
-
         for (Weapon weapon: weapons) {
             if(weapon != null) {
                 weapon.draw(g2, this);

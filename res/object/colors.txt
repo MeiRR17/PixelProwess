@@ -1,0 +1,7 @@
+common - 515151
+uncommon - 21E609
+rare - 39B1F9
+epic - A049A1
+legendary - F4FD36
+
+https://onlinetools.com/image/replace-image-color

@@ -29,6 +29,10 @@ public abstract class Weapon {
     public double FIRE_RATE;
     public double RELOAD_TIME;
 
+    public int currentAAmmo;
+    public boolean isReloading;
+    protected long reloadStartTime;
+
     public Weapon(String gunImagePath, double scale, String iconImagePath, String weaponName, String bulletPath, int DAMAGE, int MAGAZINE_SIZE, double FIRE_RATE, double RELOAD_TIME) throws IOException {
         this.gunImagePath = gunImagePath;
         this.scale = scale;
@@ -41,8 +45,31 @@ public abstract class Weapon {
         this.bulletImage = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource(this.bulletPath)));
         this.DAMAGE = DAMAGE;
         this.MAGAZINE_SIZE = MAGAZINE_SIZE;
+        this.currentAAmmo = MAGAZINE_SIZE;
         this.FIRE_RATE = FIRE_RATE;
         this.RELOAD_TIME = RELOAD_TIME;
+        this.isReloading = false;
+    }
+
+    public void reload() {
+        if(!isReloading && currentAAmmo < MAGAZINE_SIZE) {
+            isReloading = true;
+            reloadStartTime = System.currentTimeMillis();
+        }
+    }
+
+    public void updateReload() {
+        if(isReloading) {
+            long now = System.currentTimeMillis();
+            if(now - reloadStartTime > RELOAD_TIME * 1000) {
+                finishReload();
+            }
+        }
+    }
+
+    public void finishReload() {
+        currentAAmmo = MAGAZINE_SIZE;
+        isReloading = false;
     }
 
     public void draw(Graphics2D g, GamePanel gamePanel) {
@@ -69,10 +96,8 @@ public abstract class Weapon {
     }
 
     protected BufferedImage resizeImage(BufferedImage image) {
-        // Create a new BufferedImage with the desired dimensions
         BufferedImage resizedImage = new BufferedImage(32, 32, BufferedImage.TYPE_INT_ARGB);
 
-        // Draw the original image to the resized image
         Graphics2D g2d = resizedImage.createGraphics();
         g2d.drawImage(image.getScaledInstance(32, 32, Image.SCALE_SMOOTH), 0, 0, null);
         g2d.dispose();

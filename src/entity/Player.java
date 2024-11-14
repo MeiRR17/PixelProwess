@@ -22,6 +22,8 @@ public class Player extends Entity {
     private final GamePanel gamePanel;
     private final KeyHandler keyHandler;
 
+    public int health;
+
     public final int screenX;
     public final int screenY;
 
@@ -45,11 +47,8 @@ public class Player extends Entity {
 
     public static List<Bullet> bullets;
 
-    private boolean mousePressed = false; // Track mouse button state
     private MouseHandler mouseHandler;
     private long lastShotTime = 0; // Tracks the last time a shot was fired
-    private final long shootingDelay = 200; // Shooting delay in milliseconds
-
 
 
     public Weapon currentWeapon;
@@ -59,6 +58,8 @@ public class Player extends Entity {
         this.gamePanel = gamePanel;
         this.keyHandler = keyHandler;
         this.mouseHandler = mouseHandler; // Initialize mouseHandler
+
+        this.health = 100;
 
         this.screenX = gamePanel.screenWidth / 2 - (gamePanel.tileSize / 2);
         this.screenY = gamePanel.screenHeight / 2 - (gamePanel.tileSize / 2);
@@ -83,6 +84,18 @@ public class Player extends Entity {
         playerY = gamePanel.tileSize * 38;
         speed = SPEED;
         direction = "down";
+    }
+
+    public void takeDamage(int damage) {
+        health -= damage;
+        if (health < 0) {
+            health = 0; // Prevent health from going below zero
+        }
+        System.out.println("Player health after damage: " + health);
+    }
+
+    public boolean isAlive() {
+        return health > 0;
     }
 
 
@@ -281,10 +294,46 @@ public class Player extends Entity {
         }
     }
 
+    private void drawHealthBar(Graphics2D g2) {
+        int barWidth = 100; // Width of the health bar
+        int barHeight = 10; // Height of the health bar
+        int healthBarX = screenX + (playerWidth - barWidth) / 2; // Center the health bar
+        int healthBarY = screenY - 20; // Position above the player
+
+        // Draw the background of the health bar
+        g2.setColor(Color.RED);
+        g2.fillRect(healthBarX, healthBarY, barWidth, barHeight);
+
+        // Draw the current health
+        int currentHealthWidth = (int) ((barWidth * health) / 100); // Calculate width based on current health
+        g2.setColor(Color.GREEN);
+        g2.fillRect(healthBarX, healthBarY, currentHealthWidth, barHeight);
+    }
+
+    private void drawGameOverNotification(Graphics2D g2) {
+        String message = "You are down!";
+        g2.setColor(Color.WHITE);
+        g2.setFont(new Font("Arial", Font.BOLD, 24));
+        FontMetrics metrics = g2.getFontMetrics();
+        int messageWidth = metrics.stringWidth(message);
+        int messageX = (screenX + playerWidth / 2) - (messageWidth / 2);
+        int messageY = screenY + playerHeight / 2;
+
+        g2.drawString(message, messageX, messageY);
+    }
+
     public void draw(Graphics2D g2) throws IOException {
         // Draw the player's current sprite
         BufferedImage image = getCurrentSpriteImage();
         g2.drawImage(image, screenX, screenY, playerWidth, playerHeight, null);
+
+        // Draw the health bar
+        drawHealthBar(g2);
+
+        // Draw notification if the player is down
+        if (!isAlive()) {
+            drawGameOverNotification(g2);
+        }
 
         // Calculate the angle between the player and the mouse
         double angle = calculateAngleToMouse();
@@ -297,11 +346,6 @@ public class Player extends Entity {
         int weaponX = (int) (screenX + (double) playerWidth / 2 + radius * Math.cos(angle));
         int weaponY = (int) (screenY + (double) playerHeight / 2 + radius * Math.sin(angle));
 
-        // Draw current ammo count
-        if (currentWeapon != null) {
-            g2.setColor(Color.WHITE);
-            g2.drawString("Ammo: " + currentWeapon.currentAAmmo + "/" + currentWeapon.MAGAZINE_SIZE, screenX, screenY - 10);
-        }
         // Draw the weapon path around the player (for visualization)
         drawWeaponPath(g2, radius);
 
@@ -340,16 +384,16 @@ public class Player extends Entity {
             long shotDelay = (long) (1000 / currentWeapon.FIRE_RATE); // Convert to milliseconds
             // Check if enough time has passed since the last shot, if there is ammo left, and if not reloading
             if (currentTime - lastShotTime > shotDelay &&
-                    currentWeapon.currentAAmmo > 0 && !currentWeapon.isReloading) {
+                    currentWeapon.ammoLeft > 0 && !currentWeapon.isReloading) {
 
                 // Calculate the starting position of the bullet
                 int bulletX = (int) (screenX + (double) playerWidth / 2 + 85 * Math.cos(angle));
                 int bulletY = (int) (screenY + (double) playerHeight / 2 + 85 * Math.sin(angle));
                 BufferedImage bulletImage = currentBullet;
 
-                // Create a bullet with the current angle
-                bullets.add(new Bullet(bulletX, bulletY, angle, bulletImage)); // Create and add the bullet
-                currentWeapon.currentAAmmo--; // Decrease the ammo count
+                // Create a bullet with the current angle and weapon damage
+                bullets.add(new Bullet(bulletX, bulletY, angle, bulletImage, currentWeapon.DAMAGE)); // Create and add the bullet
+                currentWeapon.ammoLeft--; // Decrease the ammo count
                 lastShotTime = currentTime; // Update last shot time
             }
         }
@@ -467,10 +511,6 @@ public class Player extends Entity {
         //g2.drawRoundRect(screenX + bounds.x, screenY + bounds.y, bounds.width, bounds.height,10,50);
     }
 
-    public void setMousePressed(boolean mousePressed) {
-        this.mousePressed = mousePressed; // Set mouse pressed state
-    }
-
     public void pickUpObject(int i) {
         if (i != 999) {
             Weapon pickedWeapon = gamePanel.weapons[i]; // Get the weapon object
@@ -480,17 +520,20 @@ public class Player extends Entity {
                     case "tacticalAssaultRifle", "automaticSniper", "ak", "p90", "pistol", "sniper", "scar", "shotgun":
                         currentWeapon = pickedWeapon;
                         currentBullet = gamePanel.weapons[i].bulletImage;
+                        currentWeapon.ammoLeft = pickedWeapon.MAGAZINE_SIZE; // Set current ammo to the new weapon's magazine size
                         gamePanel.weapons[i] = null; // Remove the weapon from the game
                         break;
                     default:
                         currentWeapon = pickedWeapon; // Set current weapon to the picked weapon
                         currentBullet = gamePanel.weapons[i].bulletImage;
+                        currentWeapon.ammoLeft = pickedWeapon.MAGAZINE_SIZE; // Set current ammo to the new weapon's magazine size
                         gamePanel.weapons[i] = null; // Remove the weapon from the game
                         break;
                 }
             }
         }
     }
+
     public void setMouseHandler(MouseHandler mouseHandler) {
         this.mouseHandler = mouseHandler;
     }

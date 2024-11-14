@@ -30,13 +30,13 @@ public class ObjectPlacer {
         gamePanel.weapons[3].worldX = 43 * gamePanel.tileSize;
         gamePanel.weapons[3].worldY = 40 * gamePanel.tileSize;
 
-        gamePanel.weapons[4] = new Automatic_Sniper();
-        gamePanel.weapons[4].worldX = 44 * gamePanel.tileSize;
-        gamePanel.weapons[4].worldY = 40 * gamePanel.tileSize;
+//        gamePanel.weapons[4] = new Automatic_Sniper();
+//        gamePanel.weapons[4].worldX = 44 * gamePanel.tileSize;
+//        gamePanel.weapons[4].worldY = 40 * gamePanel.tileSize;
 
-        gamePanel.weapons[5] = new Sniper();
-        gamePanel.weapons[5].worldX = 45 * gamePanel.tileSize;
-        gamePanel.weapons[5].worldY = 40 * gamePanel.tileSize;
+//        gamePanel.weapons[5] = new Sniper();
+//        gamePanel.weapons[5].worldX = 45 * gamePanel.tileSize;
+//        gamePanel.weapons[5].worldY = 40 * gamePanel.tileSize;
 
         gamePanel.weapons[7] = new P90();
         gamePanel.weapons[7].worldX = 41 * gamePanel.tileSize;

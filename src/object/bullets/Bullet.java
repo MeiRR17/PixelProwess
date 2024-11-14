@@ -10,12 +10,14 @@ public class Bullet {
     public final int speed = 3;
     public BufferedImage image;
     public boolean bulletCollision = false;
+    public int damage;
 
-    public Bullet(int x, int y, double angle, BufferedImage image) {
+    public Bullet(int x, int y, double angle, BufferedImage image, int damage) {
         this.x = x;
         this.y = y;
         this.angle = angle;
         this.image = image;
+        this.damage = damage;
     }
 
     public void update() {

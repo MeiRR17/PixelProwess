@@ -5,7 +5,7 @@ import java.awt.event.KeyListener;
 
 public class KeyHandler implements KeyListener {
 
-    public boolean pressUp, pressDown, pressRight, pressLeft, pressSpace;
+    public boolean pressUp, pressDown, pressRight, pressLeft, pressSpace, pressReload;
 
     @Override
     public void keyTyped(KeyEvent e) {
@@ -40,6 +40,9 @@ public class KeyHandler implements KeyListener {
         if (keyCode == KeyEvent.VK_E) {
             pressSpace = true;
         }
+        if (keyCode == KeyEvent.VK_R) {
+            pressReload = true;
+        }
     }
 
     @Override
@@ -69,6 +72,10 @@ public class KeyHandler implements KeyListener {
         // E for picking up items
         if (keyCode == KeyEvent.VK_E) {
             pressSpace = false;
+        }
+
+        if (keyCode == KeyEvent.VK_R) {
+            pressReload = false;
         }
     }
 }

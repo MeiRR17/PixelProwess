@@ -50,9 +50,10 @@ public class Player extends Entity {
     private long lastShotTime = 0; // Tracks the last time a shot was fired
     private final long shootingDelay = 200; // Shooting delay in milliseconds
 
+
+
     public Weapon currentWeapon;
     public BufferedImage currentBullet;
-
 
     public Player(GamePanel gamePanel, KeyHandler keyHandler, MouseHandler mouseHandler) throws IOException {
         this.gamePanel = gamePanel;
@@ -149,6 +150,16 @@ public class Player extends Entity {
             shoot(); // Call shoot method
         }
 
+        // Check if the player is trying to reload
+        if (keyHandler.pressReload && currentWeapon != null) {
+            currentWeapon.reload();
+        }
+
+        // Handle reloading state
+        if (currentWeapon != null) {
+            currentWeapon.updateReload();
+        }
+
         // Update bullets
         for (int i = bullets.size() - 1; i >= 0; i--) {
             Bullet bullet = bullets.get(i);
@@ -164,6 +175,7 @@ public class Player extends Entity {
                 bullet.update(); // Update bullet's position if no collision
             }
         }
+
 
     }
 
@@ -285,6 +297,11 @@ public class Player extends Entity {
         int weaponX = (int) (screenX + (double) playerWidth / 2 + radius * Math.cos(angle));
         int weaponY = (int) (screenY + (double) playerHeight / 2 + radius * Math.sin(angle));
 
+        // Draw current ammo count
+        if (currentWeapon != null) {
+            g2.setColor(Color.WHITE);
+            g2.drawString("Ammo: " + currentWeapon.currentAAmmo + "/" + currentWeapon.MAGAZINE_SIZE, screenX, screenY - 10);
+        }
         // Draw the weapon path around the player (for visualization)
         drawWeaponPath(g2, radius);
 
@@ -317,7 +334,11 @@ public class Player extends Entity {
 
     public void shoot() throws IOException {
         long currentTime = System.currentTimeMillis();
-        if (currentTime - lastShotTime > shootingDelay) { // shootingDelay in milliseconds
+
+        // Check if enough time has passed since the last shot, if there is ammo left, and if not reloading
+        if (currentTime - lastShotTime > shootingDelay && currentWeapon != null &&
+                currentWeapon.currentAAmmo > 0 && !currentWeapon.isReloading) {
+
             // Calculate the starting position of the bullet
             int bulletX = (int) (screenX + (double) playerWidth / 2 + 85 * Math.cos(angle));
             int bulletY = (int) (screenY + (double) playerHeight / 2 + 85 * Math.sin(angle));
@@ -325,6 +346,7 @@ public class Player extends Entity {
 
             // Create a bullet with the current angle
             bullets.add(new Bullet(bulletX, bulletY, angle, bulletImage)); // Create and add the bullet
+            currentWeapon.currentAAmmo--; // Decrease the ammo count
             lastShotTime = currentTime; // Update last shot time
         }
     }

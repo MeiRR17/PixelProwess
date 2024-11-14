@@ -335,19 +335,23 @@ public class Player extends Entity {
     public void shoot() throws IOException {
         long currentTime = System.currentTimeMillis();
 
-        // Check if enough time has passed since the last shot, if there is ammo left, and if not reloading
-        if (currentTime - lastShotTime > shootingDelay && currentWeapon != null &&
-                currentWeapon.currentAAmmo > 0 && !currentWeapon.isReloading) {
+        // Calculate the delay between shots based on the fire rate
+        if (currentWeapon != null) {
+            long shotDelay = (long) (1000 / currentWeapon.FIRE_RATE); // Convert to milliseconds
+            // Check if enough time has passed since the last shot, if there is ammo left, and if not reloading
+            if (currentTime - lastShotTime > shotDelay &&
+                    currentWeapon.currentAAmmo > 0 && !currentWeapon.isReloading) {
 
-            // Calculate the starting position of the bullet
-            int bulletX = (int) (screenX + (double) playerWidth / 2 + 85 * Math.cos(angle));
-            int bulletY = (int) (screenY + (double) playerHeight / 2 + 85 * Math.sin(angle));
-            BufferedImage bulletImage = currentBullet;
+                // Calculate the starting position of the bullet
+                int bulletX = (int) (screenX + (double) playerWidth / 2 + 85 * Math.cos(angle));
+                int bulletY = (int) (screenY + (double) playerHeight / 2 + 85 * Math.sin(angle));
+                BufferedImage bulletImage = currentBullet;
 
-            // Create a bullet with the current angle
-            bullets.add(new Bullet(bulletX, bulletY, angle, bulletImage)); // Create and add the bullet
-            currentWeapon.currentAAmmo--; // Decrease the ammo count
-            lastShotTime = currentTime; // Update last shot time
+                // Create a bullet with the current angle
+                bullets.add(new Bullet(bulletX, bulletY, angle, bulletImage)); // Create and add the bullet
+                currentWeapon.currentAAmmo--; // Decrease the ammo count
+                lastShotTime = currentTime; // Update last shot time
+            }
         }
     }
 

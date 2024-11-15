@@ -3,6 +3,8 @@ package entity;
 import main.Collision;
 import main.GamePanel;
 import object.bullets.Bullet;
+import object.weapons.Pistol;
+import object.weapons.Shotgun;
 import object.weapons.Weapon;
 import utility.KeyHandler;
 import utility.MouseHandler;
@@ -382,21 +384,51 @@ public class Player extends Entity {
         // Calculate the delay between shots based on the fire rate
         if (currentWeapon != null) {
             long shotDelay = (long) (1000 / currentWeapon.FIRE_RATE); // Convert to milliseconds
-            // Check if enough time has passed since the last shot, if there is ammo left, and if not reloading
-            if (currentTime - lastShotTime > shotDelay &&
-                    currentWeapon.ammoLeft > 0 && !currentWeapon.isReloading) {
 
-                // Calculate the starting position of the bullet
-                int bulletX = (int) (screenX + (double) playerWidth / 2 + 85 * Math.cos(angle));
-                int bulletY = (int) (screenY + (double) playerHeight / 2 + 85 * Math.sin(angle));
-                BufferedImage bulletImage = currentBullet;
-
-                // Create a bullet with the current angle and weapon damage
-                bullets.add(new Bullet(bulletX, bulletY, angle, bulletImage, currentWeapon.DAMAGE)); // Create and add the bullet
-                currentWeapon.ammoLeft--; // Decrease the ammo count
-                lastShotTime = currentTime; // Update last shot time
+            // Check if there is ammo left and the weapon is not reloading
+            if (currentWeapon.ammoLeft > 0 && !currentWeapon.isReloading) {
+                // If the current weapon is a pistol, allow only one shot per press
+                if (currentWeapon instanceof Pistol) {
+                    // Only fire if the left mouse button is pressed and enough time has passed
+                    if (mouseHandler.isShooting() && (currentTime - lastShotTime > shotDelay)) {
+                        fireBullet();
+                        lastShotTime = currentTime; // Update last shot time
+                        mouseHandler.shooting = false; // Reset shooting state to prevent continuous firing
+                    }
+                } else {
+                    // For other weapons, allow continuous shooting if the mouse is pressed
+                    if (mouseHandler.isShooting() && (currentTime - lastShotTime > shotDelay)) {
+                        fireBullet();
+                        lastShotTime = currentTime; // Update last shot time
+                    }
+                }
             }
         }
+    }
+
+    private void fireBullet() {
+        // Calculate the starting position of the bullet
+        int bulletX = (int) (screenX + (double) playerWidth / 2 + 85 * Math.cos(angle));
+        int bulletY = (int) (screenY + (double) playerHeight / 2 + 85 * Math.sin(angle));
+        BufferedImage bulletImage = currentBullet;
+
+        // If the current weapon is a shotgun, shoot multiple bullets
+        if (currentWeapon instanceof Shotgun) {
+            int numBullets = 5; // Number of bullets to shoot
+            double damagePerBullet = (double) currentWeapon.DAMAGE / numBullets; // Damage for each bullet
+
+            // Create bullets in different directions
+            for (int i = 0; i < numBullets; i++) {
+                // Calculate the angle for each bullet
+                double bulletAngle = angle + Math.toRadians((i - 2) * 10); // Spread bullets 10 degrees apart
+                bullets.add(new Bullet(bulletX, bulletY, bulletAngle, bulletImage, (int) damagePerBullet));
+            }
+        } else {
+            // Create a single bullet for other weapons
+            bullets.add(new Bullet(bulletX, bulletY, angle, bulletImage, currentWeapon.DAMAGE));
+        }
+
+        currentWeapon.ammoLeft--; // Decrease the ammo count
     }
 
     private double calculateAngleToMouse() {

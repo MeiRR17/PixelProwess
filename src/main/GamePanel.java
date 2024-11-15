@@ -62,6 +62,15 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
         gameThread.start();
     }
 
+    public int getNextAvailableWeaponIndex() {
+        for (int i = 0; i < weapons.length; i++) {
+            if (weapons[i] == null) {
+                return i; // Return the first available index
+            }
+        }
+        return -1; // Return -1 if no available index is found
+    }
+
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);

@@ -30,7 +30,7 @@ public class TileManager {
 
     // Load tile images from the resources
     public void getTileImage() throws IOException {
-        // Tile 0 - Grass
+        // Tile 0 - Bottom left down
         tiles[0] = new Tile();
         tiles[0].image = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("tiles/grass.png")));
 

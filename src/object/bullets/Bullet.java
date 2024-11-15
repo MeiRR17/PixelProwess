@@ -7,7 +7,7 @@ import java.awt.image.BufferedImage;
 public class Bullet {
     public int x, y;
     public double angle; // Direction of the bullet
-    public final int speed = 70;
+    public final int speed = 3;
     public BufferedImage image;
     public boolean bulletCollision = false;
     public int damage;

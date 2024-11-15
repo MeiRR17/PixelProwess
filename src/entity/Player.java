@@ -378,7 +378,7 @@ public class Player extends Entity {
         drawBounds(g2);
     }
 
-    public void shoot() throws IOException {
+    public void shoot() {
         long currentTime = System.currentTimeMillis();
 
         // Calculate the delay between shots based on the fire rate
@@ -388,7 +388,7 @@ public class Player extends Entity {
             // Check if there is ammo left and the weapon is not reloading
             if (currentWeapon.ammoLeft > 0 && !currentWeapon.isReloading) {
                 // If the current weapon is a pistol, allow only one shot per press
-                if (currentWeapon instanceof Pistol) {
+                if (currentWeapon instanceof Pistol || currentWeapon instanceof Shotgun) {
                     // Only fire if the left mouse button is pressed and enough time has passed
                     if (mouseHandler.isShooting() && (currentTime - lastShotTime > shotDelay)) {
                         fireBullet();
@@ -445,9 +445,8 @@ public class Player extends Entity {
         double angle = Math.atan2(mouseY - playerCenterY, mouseX - playerCenterX);
 
         // Add 40 degrees offset to correct rifle alignment (convert 45 degrees to radians)
-        double adjustedAngle = angle + Math.toRadians(45);
 
-        return adjustedAngle;
+        return angle + Math.toRadians(45);
     }
 
 

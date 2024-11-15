@@ -1,7 +1,7 @@
 package main;
 
 import entity.Player;
-import object.ObjMaster;
+import object.bullets.Bullet;
 import object.weapons.Weapon;
 import tile.TileManager;
 import utility.KeyHandler;
@@ -27,7 +27,7 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
 
     public final int worldColumn = 80;
     public final int worldRow = 80;
-    private int something = Toolkit.getDefaultToolkit().getScreenResolution();
+//    private int something = Toolkit.getDefaultToolkit().getScreenResolution();
 
     int FPS = 60;
     TileManager tileManager = new TileManager(this);
@@ -50,7 +50,7 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
         this.addMouseListener(mouseHandler);
         this.addMouseMotionListener(this); // Add the mouse motion listener
         player = new Player(this, keyHandler, mouseHandler); // Updated line
-        System.out.println(something);
+//        System.out.println(something);
     }
 
     public void gameSet() throws IOException {
@@ -60,6 +60,46 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
     public void startGameThread() {
         gameThread = new Thread(this);
         gameThread.start();
+    }
+
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g;
+
+        // Layer 1: Draw the tiles
+        tileManager.draw(g2);
+
+        // Layer 2: Draw the weapons
+        for (Weapon weapon : weapons) {
+            if (weapon != null) {
+                weapon.draw(g2, this);
+            }
+        }
+
+        // Layer 3: Draw the player
+        try {
+            player.draw(g2);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        drawBulletsLeft(g2, player.currentWeapon); // Pass the current weapon to get ammo count
+
+        g2.dispose(); // Dispose of this graphics context and release any system resources
+    }
+
+    private void drawBulletsLeft(Graphics2D g2, Weapon currentWeapon) {
+        if (currentWeapon != null) {
+            String bulletsLeft = "Bullets: " + currentWeapon.ammoLeft + "/" + currentWeapon.MAGAZINE_SIZE;
+            g2.setColor(Color.WHITE);
+            g2.setFont(new Font("Arial", Font.PLAIN, 20)); // Adjust font size here
+            FontMetrics metrics = g2.getFontMetrics();
+            int messageWidth = metrics.stringWidth(bulletsLeft);
+            int messageX = screenWidth - messageWidth - 10; // Position from the right
+            int messageY = screenHeight - 10; // Position from the bottom
+
+            g2.drawString(bulletsLeft, messageX, messageY);
+        }
     }
 
     @Override
@@ -95,30 +135,21 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
 
     public void update() throws IOException {
         player.update();
-        // Update player state
-    }
 
-    // To draw something on the screen
-    @Override
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D) g;
-        // Layer 1
-        tileManager.draw(g2);
-        // Layer 2
-        for (Weapon weapon: weapons) {
-            if(weapon != null) {
-                weapon.draw(g2, this);
+        // Check for bullet collisions with the player
+        for (int i = Player.bullets.size() - 1; i >= 0; i--) {
+            Bullet bullet = Player.bullets.get(i);
+
+            // Log bullet position and player's health for debugging
+            System.out.printf("Bullet at position X: %d, Y: %d%n", bullet.x, bullet.y);
+            System.out.printf("Player Health: %d%n", player.health);
+
+            if (bullet.calculateRectangle().intersects(player.bounds)) {
+                player.takeDamage(bullet.damage); // Apply damage to the player
+                System.out.println("Player hit by bullet! Damage taken: " + bullet.damage);
+                Player.bullets.remove(i); // Remove the bullet after it hits
             }
         }
-        // Layer 3
-        try {
-            player.draw(g2);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        g2.dispose(); // Dispose of this graphics context and release any system resources
     }
 
     // Mouse motion listener methods

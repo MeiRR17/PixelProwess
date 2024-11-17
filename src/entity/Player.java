@@ -160,27 +160,100 @@ public class Player extends Entity {
         }
     }
 
-    private void dropWeapon() {
+    public void pickUpObject(Weapon weapon) {
+        if (weapon == null) {
+            return; // Early exit if weapon is null
+        }
+
+        // Remove the weapon from the game before picking it up
+        removeWeaponFromGame(weapon);
+
+        // Check the type of weapon and manage current weapons accordingly
+        if (isSmallGun(weapon)) {
+            handleSmallGunPickup(weapon);
+        } else if (isBigGun(weapon)) {
+            handleBigGunPickup(weapon);
+        } else {
+            handleOtherWeaponPickup(weapon);
+        }
+    }
+
+    private boolean isSmallGun(Weapon weapon) {
+        return weapon instanceof Pistol;
+    }
+
+    private boolean isBigGun(Weapon weapon) {
+        return weapon instanceof Shotgun ||
+                weapon instanceof Scar ||
+                weapon instanceof P90 ||
+                weapon instanceof AK ||
+                weapon instanceof TacticalAssaultRifle;
+    }
+
+    private void handleSmallGunPickup(Weapon weapon) {
+        if (smallGun != null) {
+            dropWeapon(smallGun); // Drop the current small gun
+        }
+        setSmallGun(weapon); // Set the small gun to the picked pistol
+        currentWeapon = smallGun; // Update current weapon
+    }
+
+    private void handleBigGunPickup(Weapon weapon) {
+        if (bigGun != null) {
+            dropWeapon(bigGun); // Drop the current big gun
+        }
+        setBigGun(weapon); // Set the big gun to the picked weapon
+        currentWeapon = bigGun; // Update current weapon
+    }
+
+    private void handleOtherWeaponPickup(Weapon weapon) {
         if (currentWeapon != null) {
-            // Stop any ongoing reload process
-            currentWeapon.isReloading = false; // Stop reloading
+            dropWeapon(currentWeapon); // Drop the current weapon
+        }
 
-            // Set the world position of the current weapon to the player's position
-            currentWeapon.worldX = playerX; // Set the world position to the player's position
-            currentWeapon.worldY = playerY;
+        currentWeapon = weapon; // Set the current weapon to the picked weapon
+        currentBullet = weapon.bulletImage; // Update the current bullet image
+    }
 
-            // Place the dropped weapon in the game world
-            int index = gamePanel.getNextAvailableWeaponIndex();
-            if (index != -1) {
-                gamePanel.weapons[index] = currentWeapon; // Assign the current weapon to the available index
+    private void removeWeaponFromGame(Weapon weapon) {
+        for (int i = 0; i < gamePanel.weapons.length; i++) {
+            if (gamePanel.weapons[i] == weapon) {
+                gamePanel.weapons[i] = null; // Remove the weapon from the game
+                break;
             }
+        }
+    }
 
-            // Reset the current weapon
+    private void dropWeapon(Weapon weapon) {
+        if (weapon == null) {
+            return; // Early exit if weapon is null
+        }
+
+        // Stop any ongoing reload process
+        weapon.isReloading = false; // Stop reloading
+
+        // Create a new instance to represent the dropped weapon in the world
+        Weapon droppedWeapon = null; // Ensure you implement a clone method in the Weapon class
+        try {
+            droppedWeapon = weapon.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+        droppedWeapon.worldX = playerX; // Set the dropped weapon's X position
+        droppedWeapon.worldY = playerY; // Set the dropped weapon's Y position
+
+        // Place the dropped weapon in the game world
+        int index = gamePanel.getNextAvailableWeaponIndex();
+        if (index != -1) {
+            gamePanel.weapons[index] = droppedWeapon; // Assign the dropped weapon to the available index
+        }
+
+        // Reset the player's current weapon
+        if (currentWeapon == weapon) {
             currentWeapon = null; // Remove the weapon from the player
             currentBullet = null; // Reset the bullet image
         }
     }
-
 
     private BufferedImage loadImage(String path) throws IOException {
         return ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(path)));
@@ -213,7 +286,7 @@ public class Player extends Entity {
         checkNearbyWeapons();
 
         if (keyHandler.pressDropWeapon) {
-            dropWeapon();
+            dropWeapon(currentWeapon);
         }
 
         // Check if the player is trying to pick up a weapon
@@ -413,39 +486,34 @@ public class Player extends Entity {
             drawGameOverNotification(g2);
         }
 
-        // Calculate the angle between the player and the mouse
-        double angle = calculateAngleToMouse();
-        double angleOffset = Math.toRadians(-45); // Offset to align the weapon correctly
-        angle += angleOffset;
-
-        int radius = 85;
-
-        // Calculate the weapon's position using the adjusted angle and radius
-        int weaponX = (int) (screenX + (double) playerWidth / 2 + radius * Math.cos(angle));
-        int weaponY = (int) (screenY + (double) playerHeight / 2 + radius * Math.sin(angle));
-
-        // Draw the weapon path around the player (for visualization)
-        drawWeaponPath(g2, radius);
-
-        // Draw the green line extending from the weapon
-        drawAngleLine(g2, angle, radius, weaponX, weaponY);
-
-        // Correct gun alignment by adjusting its rotation and image rendering
-        AffineTransform originalTransform = g2.getTransform();
-
-        // Translate to the weapon position
-        g2.translate(weaponX, weaponY);
-
-        // Rotate the gun based on the calculated angle
-        g2.rotate(angle);
-
-        // Draw the current weapon image if it exists
+        // Check if the current weapon is not null before drawing
         if (currentWeapon != null) {
-            g2.drawImage(currentWeapon.gunImage, -currentWeapon.gunImage.getWidth() / 2, -currentWeapon.gunImage.getHeight() / 2, null);
-        }
+            // Calculate the angle between the player and the mouse
+            double angle = calculateAngleToMouse();
+            double angleOffset = Math.toRadians(-45); // Offset to align the weapon correctly
+            angle += angleOffset;
 
-        // Restore the original transform
-        g2.setTransform(originalTransform);
+            int radius = 85;
+
+            // Calculate the weapon's position using the adjusted angle and radius
+            int weaponX = (int) (screenX + (double) playerWidth / 2 + radius * Math.cos(angle));
+            int weaponY = (int) (screenY + (double) playerHeight / 2 + radius * Math.sin(angle));
+
+            // Correct gun alignment by adjusting its rotation and image rendering
+            AffineTransform originalTransform = g2.getTransform();
+
+            // Translate to the weapon position
+            g2.translate(weaponX, weaponY);
+
+            // Rotate the gun based on the calculated angle
+            g2.rotate(angle);
+
+            // Draw the current weapon image if it exists
+            g2.drawImage(currentWeapon.gunImage, -currentWeapon.gunImage.getWidth() / 2, -currentWeapon.gunImage.getHeight() / 2, null);
+
+            // Restore the original transform
+            g2.setTransform(originalTransform);
+        }
 
         // Draw bullets
         for (Bullet bullet : bullets) {
@@ -462,7 +530,6 @@ public class Player extends Entity {
             g2.drawString("Press 'E' to pick up " + nearbyWeapon.weaponName, screenX, screenY - 30);
         }
     }
-
     public void shoot() {
         long currentTime = System.currentTimeMillis();
 
@@ -543,8 +610,6 @@ public class Player extends Entity {
         // Calculate the angle using Math.atan2, which gives the angle in radians
         angle = Math.atan2(mouseY - playerCenterY, mouseX - playerCenterX);
     }
-
-
 
     private void drawAngleLine(Graphics2D g2, double angle, int radius, int weaponX, int weaponY) {
         // Calculate the end point of the line
@@ -627,43 +692,7 @@ public class Player extends Entity {
         //g2.drawRoundRect(screenX + bounds.x, screenY + bounds.y, bounds.width, bounds.height,10,50);
     }
 
-    public void pickUpObject(Weapon weapon) {
-        if (weapon != null) {
-            // Check if the weapon is a pistol
-            if (weapon instanceof Pistol) {
-                // If the player already has a small gun, drop it
-                if (smallGun != null) {
-                    dropWeapon(); // Drop the current small gun
-                }
-                setSmallGun(weapon); // Set the small gun to the picked pistol
-                currentWeapon = smallGun; // Set the current weapon to the small gun
-            } else if (weapon instanceof Shotgun || weapon instanceof Scar || weapon instanceof P90 || weapon instanceof AK || weapon instanceof TacticalAssaultRifle) {
-                // If the player already has a big gun, drop it
-                if (bigGun != null) {
-                    dropWeapon(); // Drop the current big gun
-                }
-                setBigGun(weapon); // Set the big gun to the picked shotgun
-                currentWeapon = bigGun; // Set the current weapon to the big gun
-            } else {
-                // For other weapon types, drop the current weapon if it exists
-                if (currentWeapon != null) {
-                    dropWeapon(); // Drop the current weapon
-                }
 
-                // Set the current weapon to the picked weapon
-                currentWeapon = weapon;
-                currentBullet = weapon.bulletImage; // Set the current bullet image
-            }
-
-            // Remove the weapon from the game
-            for (int i = 0; i < gamePanel.weapons.length; i++) {
-                if (gamePanel.weapons[i] == weapon) {
-                    gamePanel.weapons[i] = null; // Remove the weapon from the game
-                    break;
-                }
-            }
-        }
-    }
     public void setMouseHandler(MouseHandler mouseHandler) {
         this.mouseHandler = mouseHandler;
     }

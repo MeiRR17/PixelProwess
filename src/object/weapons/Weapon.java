@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.Random;
 
-public abstract class Weapon {
+public abstract class Weapon implements Cloneable {
     private static final Random random = new Random();
     protected String gunImagePath;  // Image used in-game
     protected String[] iconImagePath; // Image used as tile icon
@@ -59,6 +59,11 @@ public abstract class Weapon {
         // Adjust stats based on rarity
         adjustStatsBasedOnRarity();
         this.isReloading = false;
+    }
+
+    @Override
+    public Weapon clone() throws CloneNotSupportedException {
+        return (Weapon) super.clone(); // Call the superclass's clone method
     }
 
     public void reload() {
@@ -131,6 +136,8 @@ public abstract class Weapon {
             }
         }
     }
+
+
 
     public void finishReload() {
         // Only refill ammo if the weapon is not dropped

@@ -5,7 +5,9 @@ import java.awt.event.KeyListener;
 
 public class KeyHandler implements KeyListener {
 
-    public boolean pressUp, pressDown, pressRight, pressLeft, pressSpace, pressReload;
+    public boolean pressUp, pressDown, pressRight, pressLeft,
+            pressPickUpWeapon, pressReload, pressDropWeapon,
+            pressSmallWeapon, pressBigWeapon;
 
     @Override
     public void keyTyped(KeyEvent e) {
@@ -38,10 +40,26 @@ public class KeyHandler implements KeyListener {
 
         // E for picking up items
         if (keyCode == KeyEvent.VK_E) {
-            pressSpace = true;
+            pressPickUpWeapon = true;
         }
+        // R for reload
         if (keyCode == KeyEvent.VK_R) {
             pressReload = true;
+        }
+
+        // Q for dropping items
+        if(keyCode == KeyEvent.VK_Q){
+            pressDropWeapon = true;
+        }
+
+        // 2 for picking small gun
+        if(keyCode == KeyEvent.VK_2){
+            pressSmallWeapon = true;
+        }
+
+        // 3 for picking big gun
+        if(keyCode == KeyEvent.VK_3){
+            pressBigWeapon  = true;
         }
     }
 
@@ -71,11 +89,27 @@ public class KeyHandler implements KeyListener {
 
         // E for picking up items
         if (keyCode == KeyEvent.VK_E) {
-            pressSpace = false;
+            pressPickUpWeapon = false;
         }
 
+        // R for reload
         if (keyCode == KeyEvent.VK_R) {
             pressReload = false;
+        }
+
+        // Q for dropping items
+        if(keyCode == KeyEvent.VK_Q){
+            pressDropWeapon = false;
+        }
+
+        // 2 for picking small gun
+        if(keyCode == KeyEvent.VK_2){
+            pressSmallWeapon = false;
+        }
+
+        // 3 for picking big gun
+        if(keyCode == KeyEvent.VK_3){
+            pressBigWeapon  = false;
         }
     }
 }

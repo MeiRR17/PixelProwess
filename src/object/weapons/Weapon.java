@@ -133,7 +133,10 @@ public abstract class Weapon {
     }
 
     public void finishReload() {
-        ammoLeft = MAGAZINE_SIZE;
+        // Only refill ammo if the weapon is not dropped
+        if (ammoLeft < MAGAZINE_SIZE) {
+            ammoLeft = MAGAZINE_SIZE; // Refill ammo to magazine size
+        }
         isReloading = false;
     }
 

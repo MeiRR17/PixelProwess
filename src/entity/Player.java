@@ -3,9 +3,7 @@ package entity;
 import main.Collision;
 import main.GamePanel;
 import object.bullets.Bullet;
-import object.weapons.Pistol;
-import object.weapons.Shotgun;
-import object.weapons.Weapon;
+import object.weapons.*;
 import utility.KeyHandler;
 import utility.MouseHandler;
 import utility.MouseInfoUtil;
@@ -45,16 +43,21 @@ public class Player extends Entity {
     private static final int BOUND_WIDTH = 30;
     private static final int BOUND_HEIGHT = 30;
 
-    public Weapon[] guns = new Weapon[5];
-
     public static List<Bullet> bullets;
 
     private MouseHandler mouseHandler;
     private long lastShotTime = 0; // Tracks the last time a shot was fired
 
+    private long lastPickupTime = 0; // Tracks the last time a weapon was picked up
+    private static final long PICKUP_COOLDOWN = 1000; // Cooldown duration in milliseconds (1 second)
 
     public Weapon currentWeapon;
+    public Weapon smallGun;
+    public Weapon bigGun;
+
     public BufferedImage currentBullet;
+
+    private Weapon nearbyWeapon; // To store the nearby weapon
 
     public Player(GamePanel gamePanel, KeyHandler keyHandler, MouseHandler mouseHandler) throws IOException {
         this.gamePanel = gamePanel;
@@ -142,25 +145,93 @@ public class Player extends Entity {
     }
 
 
+    private void checkNearbyWeapons() {
+        nearbyWeapon = null; // Reset the nearby weapon
+        for (int i = 0; i < gamePanel.weapons.length; i++) {
+            Weapon weapon = gamePanel.weapons[i];
+            if (weapon != null) {
+                // Calculate the distance between the player and the weapon
+                double distance = Math.sqrt(Math.pow(playerX - weapon.worldX, 2) + Math.pow(playerY - weapon.worldY, 2));
+                if (distance < 100) { // Adjust the distance as needed
+                    nearbyWeapon = weapon; // Store the nearby weapon
+                    break; // Exit the loop if a nearby weapon is found
+                }
+            }
+        }
+    }
+
+    private void dropWeapon() {
+        if (currentWeapon != null) {
+            // Stop any ongoing reload process
+            currentWeapon.isReloading = false; // Stop reloading
+
+            // Set the world position of the current weapon to the player's position
+            currentWeapon.worldX = playerX; // Set the world position to the player's position
+            currentWeapon.worldY = playerY;
+
+            // Place the dropped weapon in the game world
+            int index = gamePanel.getNextAvailableWeaponIndex();
+            if (index != -1) {
+                gamePanel.weapons[index] = currentWeapon; // Assign the current weapon to the available index
+            }
+
+            // Reset the current weapon
+            currentWeapon = null; // Remove the weapon from the player
+            currentBullet = null; // Reset the bullet image
+        }
+    }
+
 
     private BufferedImage loadImage(String path) throws IOException {
         return ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(path)));
     }
 
-    public void update() throws IOException {
+    // Method to set the small gun
+    public void setSmallGun(Weapon weapon) {
+        this.smallGun = weapon;
+    }
+
+    // Method to set the big gun
+    public void setBigGun(Weapon weapon) {
+        this.bigGun = weapon;
+    }
+
+
+
+    public void update() {
         if (isMoving()) {
             handleMovement();
-            int objIndex = gamePanel.collisionCheck.checkObject(this, true);
-            pickUpObject(objIndex);
             updateSpriteAnimation();
-            if (!bullets.isEmpty() && !playerCollision){
+            if (!bullets.isEmpty() && !playerCollision) {
                 moveBullet();
             }
         } else {
             spriteNumber = 1; // Reset to standing sprite
         }
 
-        //check if shooting
+        // Check for nearby weapons
+        checkNearbyWeapons();
+
+        if (keyHandler.pressDropWeapon) {
+            dropWeapon();
+        }
+
+        // Check if the player is trying to pick up a weapon
+        long currentTime = System.currentTimeMillis();
+        if (keyHandler.pressPickUpWeapon && nearbyWeapon != null && (currentTime - lastPickupTime) > PICKUP_COOLDOWN) {
+            pickUpObject(nearbyWeapon); // Pass the nearby weapon to the pickup method
+            lastPickupTime = currentTime; // Update the last pickup time
+        }
+
+        // Check for weapon switching
+        if (keyHandler.pressSmallWeapon) {
+            switchToSmallGun();
+        }
+        if (keyHandler.pressBigWeapon) {
+            switchToBigGun();
+        }
+
+        // Check if shooting
         if (currentBullet != null && mouseHandler.isShooting()) {
             shoot(); // Call shoot method
         }
@@ -178,11 +249,6 @@ public class Player extends Entity {
         // Update bullets
         for (int i = bullets.size() - 1; i >= 0; i--) {
             Bullet bullet = bullets.get(i);
-
-            // Log the bullet's current position before checking collisions
-            System.out.printf("Bullet at position X: %d, Y: %d%n", bullet.x, bullet.y);
-
-            // Check the collision with walls, trees, etc.
             if (Collision.checkCollision(bullet.calculateRectangle()) ||
                     bullet.y > 5120 || bullet.x > 5120 || bullet.y < 0 || bullet.x < 0) {
                 bullets.remove(i); // Remove the bullet when it collides or goes out of bounds
@@ -190,8 +256,19 @@ public class Player extends Entity {
                 bullet.update(); // Update bullet's position if no collision
             }
         }
+    }
+    private void switchToSmallGun() {
+        if (smallGun != null) {
+            currentWeapon = smallGun; // Switch to the small gun (pistol)
+            currentBullet = smallGun.bulletImage; // Set the current bullet image
+        }
+    }
 
-
+    private void switchToBigGun() {
+        if (bigGun != null) {
+            currentWeapon = bigGun; // Switch to the big gun (shotgun)
+            currentBullet = bigGun.bulletImage; // Set the current bullet image
+        }
     }
 
     private boolean isMoving() {
@@ -260,7 +337,6 @@ public class Player extends Entity {
                 }
                 case "down" -> {
                     bullets.get(i).y -= speed;
-
                 }
                 case "right" -> {
                     bullets.get(i).x -= speed;
@@ -375,7 +451,16 @@ public class Player extends Entity {
         for (Bullet bullet : bullets) {
             bullet.draw(g2); // Draw the bullet
         }
+
+        // Draw bounds for debugging
         drawBounds(g2);
+
+        // Draw pickup message if a weapon is nearby
+        if (nearbyWeapon != null) {
+            g2.setColor(Color.YELLOW);
+            g2.setFont(new Font("Arial", Font.BOLD, 16));
+            g2.drawString("Press 'E' to pick up " + nearbyWeapon.weaponName, screenX, screenY - 30);
+        }
     }
 
     public void shoot() {
@@ -542,29 +627,43 @@ public class Player extends Entity {
         //g2.drawRoundRect(screenX + bounds.x, screenY + bounds.y, bounds.width, bounds.height,10,50);
     }
 
-    public void pickUpObject(int i) {
-        if (i != 999) {
-            Weapon pickedWeapon = gamePanel.weapons[i]; // Get the weapon object
-            if (pickedWeapon != null) {
-                String objectName = pickedWeapon.weaponName;
-                switch (objectName) {
-                    case "tacticalAssaultRifle", "automaticSniper", "ak", "p90", "pistol", "sniper", "scar", "shotgun":
-                        currentWeapon = pickedWeapon;
-                        currentBullet = gamePanel.weapons[i].bulletImage;
-                        currentWeapon.ammoLeft = pickedWeapon.MAGAZINE_SIZE; // Set current ammo to the new weapon's magazine size
-                        gamePanel.weapons[i] = null; // Remove the weapon from the game
-                        break;
-                    default:
-                        currentWeapon = pickedWeapon; // Set current weapon to the picked weapon
-                        currentBullet = gamePanel.weapons[i].bulletImage;
-                        currentWeapon.ammoLeft = pickedWeapon.MAGAZINE_SIZE; // Set current ammo to the new weapon's magazine size
-                        gamePanel.weapons[i] = null; // Remove the weapon from the game
-                        break;
+    public void pickUpObject(Weapon weapon) {
+        if (weapon != null) {
+            // Check if the weapon is a pistol
+            if (weapon instanceof Pistol) {
+                // If the player already has a small gun, drop it
+                if (smallGun != null) {
+                    dropWeapon(); // Drop the current small gun
+                }
+                setSmallGun(weapon); // Set the small gun to the picked pistol
+                currentWeapon = smallGun; // Set the current weapon to the small gun
+            } else if (weapon instanceof Shotgun || weapon instanceof Scar || weapon instanceof P90 || weapon instanceof AK || weapon instanceof TacticalAssaultRifle) {
+                // If the player already has a big gun, drop it
+                if (bigGun != null) {
+                    dropWeapon(); // Drop the current big gun
+                }
+                setBigGun(weapon); // Set the big gun to the picked shotgun
+                currentWeapon = bigGun; // Set the current weapon to the big gun
+            } else {
+                // For other weapon types, drop the current weapon if it exists
+                if (currentWeapon != null) {
+                    dropWeapon(); // Drop the current weapon
+                }
+
+                // Set the current weapon to the picked weapon
+                currentWeapon = weapon;
+                currentBullet = weapon.bulletImage; // Set the current bullet image
+            }
+
+            // Remove the weapon from the game
+            for (int i = 0; i < gamePanel.weapons.length; i++) {
+                if (gamePanel.weapons[i] == weapon) {
+                    gamePanel.weapons[i] = null; // Remove the weapon from the game
+                    break;
                 }
             }
         }
     }
-
     public void setMouseHandler(MouseHandler mouseHandler) {
         this.mouseHandler = mouseHandler;
     }

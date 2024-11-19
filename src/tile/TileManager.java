@@ -25,7 +25,7 @@ public class TileManager {
         collisionBounds = new Rectangle[gamePanel.worldColumn][gamePanel.worldRow];
 
         getTileImage(); // Load the tile images
-        load("/maps/mapv2.txt"); // Load the map layout
+        load("/maps/map.txt"); // Load the map layout
     }
 
     // Load tile images from the resources

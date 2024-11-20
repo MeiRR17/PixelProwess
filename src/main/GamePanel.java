@@ -22,8 +22,10 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
     public final int tileSize = orgTileSize * scale;
     public final int maxScreenColumn = 30;
     public final int maxScreenRow = 18;
-    public final int screenWidth = tileSize * maxScreenColumn;
-    public final int screenHeight = tileSize * maxScreenRow;
+    private static final Dimension size = Toolkit.getDefaultToolkit().getScreenSize(); // Gets the size of user's window
+
+    public final int screenWidth = size.width;
+    public final int screenHeight = size.height;
 
     public final int worldColumn = 100;
     public final int worldRow = 100;

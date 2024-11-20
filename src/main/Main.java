@@ -19,7 +19,7 @@ public class Main {
         window.setTitle("Pixel Prowess");
         GraphicsEnvironment graphic=GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice graphicsDevice= graphic.getDefaultScreenDevice();
-        GamePanel gamePanel = new GamePanel();
+        GamePanel gamePanel = new GamePanel(window);
         window.add(gamePanel);
 
         window.pack();

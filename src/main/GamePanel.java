@@ -9,6 +9,7 @@ import utility.MouseHandler;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.io.IOException;
@@ -31,6 +32,13 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
     public final int worldRow = 100;
 //    private int something = Toolkit.getDefaultToolkit().getScreenResolution();
 
+    private int frameCount = 0;
+    private int currentFPS = 0;
+    private long lastTime = System.nanoTime();
+
+    private boolean isFullscreen = false; // Track whether we are in fullscreen
+    private JFrame frame; // Reference to the JFrame
+
     int FPS = 60;
     TileManager tileManager = new TileManager(this);
 
@@ -42,17 +50,45 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
     public Weapon[] weapons = new Weapon[25];
 
 
-    public GamePanel() throws IOException {
-        this.setPreferredSize(new Dimension(screenWidth, screenHeight)); // Set the wanted size of the panel
+    public GamePanel(JFrame frame) throws IOException {
+        this.frame = frame; // Assign the JFrame reference
+        this.setPreferredSize(new Dimension(screenWidth, screenHeight));
         this.setBackground(Color.black);
-        this.setDoubleBuffered(true); // Set this component to be double buffered
+        this.setDoubleBuffered(true);
         this.addKeyListener(keyHandler);
-        this.setFocusable(true); // Make the GamePanel receive key input
+        this.setFocusable(true);
         MouseHandler mouseHandler = new MouseHandler(player);
         this.addMouseListener(mouseHandler);
-        this.addMouseMotionListener(this); // Add the mouse motion listener
-        player = new Player(this, keyHandler, mouseHandler); // Updated line
-//        System.out.println(something);
+        this.addMouseMotionListener(this);
+        player = new Player(this, keyHandler, mouseHandler);
+
+        // Add a key listener to toggle fullscreen mode using Alt + Enter
+        this.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                if (evt.getKeyCode() == KeyEvent.VK_ENTER && evt.isAltDown()) { // Press 'Alt + Enter' to toggle fullscreen
+                    toggleFullScreen();
+                }
+            }
+        });
+    }
+
+    private void toggleFullScreen() {
+        if (isFullscreen) {
+            // Switch to windowed mode
+            frame.dispose(); // Dispose of the current frame
+            frame.setUndecorated(false); // Remove fullscreen decorations
+            frame.setSize(800, 600); // Set your desired window size
+            frame.setLocationRelativeTo(null); // Center the window
+            frame.setVisible(true); // Show the window
+        } else {
+            // Switch to fullscreen mode
+            frame.dispose(); // Dispose of the current frame
+            frame.setUndecorated(true); // Remove window decorations
+            frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // Maximize the frame
+            frame.setVisible(true); // Show the frame
+        }
+        isFullscreen = !isFullscreen; // Toggle the state
     }
 
     public void gameSet() throws IOException {
@@ -96,7 +132,17 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
         }
         drawBulletsLeft(g2, player.currentWeapon); // Pass the current weapon to get ammo count
 
+        // Draw FPS
+        drawFPS(g2);
+
         g2.dispose(); // Dispose of this graphics context and release any system resources
+    }
+
+    private void drawFPS(Graphics2D g2) {
+        String fpsText = "FPS: " + currentFPS;
+        g2.setColor(Color.WHITE);
+        g2.setFont(new Font("Arial", Font.PLAIN, 20)); // Adjust font size here
+        g2.drawString(fpsText, 10, 20); // Draw FPS at the top left corner
     }
 
     private void drawBulletsLeft(Graphics2D g2, Weapon currentWeapon) {
@@ -125,8 +171,18 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+
             // DRAW : draw the screen (basically the FPS of the game)
             repaint();
+
+            // Calculate FPS
+            frameCount++;
+            long currentTime = System.nanoTime();
+            if (currentTime - lastTime >= 1000000000) { // 1 second
+                currentFPS = frameCount;
+                frameCount = 0;
+                lastTime = currentTime;
+            }
 
             try {
                 double remainingTime = nextDrawTime - System.nanoTime();

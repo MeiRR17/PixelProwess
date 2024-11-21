@@ -2,7 +2,7 @@ package object.weapons;
 
 import java.io.IOException;
 
-public class TacticalAssaultRifle extends Weapon {
+public class TacticalAssaultRifle extends Big {
     public TacticalAssaultRifle() throws IOException {
         super("object/weapon/combat/rifle/Pindad_SS1.png", 3,
                 new String[]{"object/weapon/icon/rifle/Pindad/common.png",

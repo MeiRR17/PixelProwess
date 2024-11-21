@@ -161,41 +161,29 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
 
     @Override
     public void run() {
-        double interval = (double) 1000000000 / FPS;
-        double nextDrawTime = System.nanoTime() + interval;
+        double interval = 1_000_000_000.0 / FPS;
+        long lastTime = System.nanoTime();
+        long now;
 
         while (gameThread != null) {
-            // UPDATE : update information
-            try {
-                update();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            now = System.nanoTime();
+            double delta = (now - lastTime) / interval;
 
-            // DRAW : draw the screen (basically the FPS of the game)
-            repaint();
-
-            // Calculate FPS
-            frameCount++;
-            long currentTime = System.nanoTime();
-            if (currentTime - lastTime >= 1000000000) { // 1 second
-                currentFPS = frameCount;
-                frameCount = 0;
-                lastTime = currentTime;
-            }
-
-            try {
-                double remainingTime = nextDrawTime - System.nanoTime();
-                remainingTime /= 1000000;
-
-                if (remainingTime < 0) {
-                    remainingTime = 0;
+            if (delta >= 1) {
+                try {
+                    update();
+                    repaint();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
+                lastTime = now;
+            }
 
-                Thread.sleep((long) remainingTime);
-                nextDrawTime += interval;
+            // Sleep the thread for a short duration
+            try {
+                Thread.sleep(1); // Prevent busy-waiting
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         }
     }

@@ -2,7 +2,7 @@ package object.weapons;
 
 import java.io.IOException;
 
-public class Scar extends Weapon {
+public class Scar extends Big {
     public Scar() throws IOException {
         super("object/weapon/combat/rifle/Scar.png", 3,
                 new String[]{"object/weapon/icon/rifle/Scar/common.png",

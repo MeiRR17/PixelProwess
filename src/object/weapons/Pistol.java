@@ -2,7 +2,7 @@ package object.weapons;
 
 import java.io.IOException;
 
-public class Pistol extends Weapon {
+public class Pistol extends Small {
     public Pistol() throws IOException {
         super("object/weapon/combat/pistol/pistol.png", 3,
                 new String[]{"object/weapon/icon/pistol/common.png",

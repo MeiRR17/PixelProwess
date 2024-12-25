@@ -11,6 +11,7 @@ public class Collision {
         this.gamePanel = gamePanel;
     }
 
+
     public void checkTile(Entity entity) {
         int entityLeftWorldX = entity.playerX + entity.bounds.x;
         int entityRightWorldX = entity.playerX + entity.bounds.x + entity.bounds.width;

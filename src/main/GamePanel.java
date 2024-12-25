@@ -1,5 +1,6 @@
 package main;
 
+import entity.AIMob;
 import entity.Player;
 import object.bullets.Bullet;
 import object.weapons.Weapon;
@@ -13,12 +14,14 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.io.IOException;
 import java.awt.Toolkit;
+import java.util.ArrayList;
+
 
 public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     public final int screenWidth = screenSize.width;
     public final int screenHeight = screenSize.height - 30;
-
+    public ArrayList<AIMob> mobs = new ArrayList<>();
 
     // Screen settings
     public final int orgTileSize = 32; // 32x32 tile
@@ -33,7 +36,6 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
 //    private int something = Toolkit.getDefaultToolkit().getScreenResolution();
 
     int FPS = 60;
-    TileManager tileManager = new TileManager(this);
 
     KeyHandler keyHandler = new KeyHandler();
     Thread gameThread;
@@ -41,7 +43,7 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
     public ObjectPlacer objectPlacer = new ObjectPlacer(this);
     public Player player = new Player(this, keyHandler, null);
     public Weapon[] weapons = new Weapon[25];
-
+    public TileManager tileManager;
 
     public GamePanel() throws IOException {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight)); // Set the wanted size of the panel
@@ -53,12 +55,19 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
         this.addMouseListener(mouseHandler);
         this.addMouseMotionListener(this); // Add the mouse motion listener
         player = new Player(this, keyHandler, mouseHandler); // Updated line
+        tileManager = new TileManager(this);
 //        System.out.println(something);
     }
 
     public void gameSet() throws IOException {
         objectPlacer.placeObjects();
+        // Add multiple mobs to the list
+        for (int i = 0; i < 5; i++) {
+            mobs.add(new AIMob(this, player, tileManager)); // Pass the tileManager instance
+        }
     }
+
+
 
     public void startGameThread() {
         gameThread = new Thread(this);
@@ -89,16 +98,18 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
             }
         }
 
-        // Layer 3: Draw the player
-        try {
-            player.draw(g2);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        for (AIMob mob : mobs) {
+            mob.draw(g2);
         }
+
+        // Layer 3: Draw the player
+        player.draw(g2); // Removed try-catch block
+
         drawBulletsLeft(g2, player.currentWeapon); // Pass the current weapon to get ammo count
 
         g2.dispose(); // Dispose of this graphics context and release any system resources
     }
+
 
     private void drawBulletsLeft(Graphics2D g2, Weapon currentWeapon) {
         if (currentWeapon != null) {
@@ -148,18 +159,35 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
     public void update() throws IOException {
         player.update();
 
-        // Check for bullet collisions with the player
+        // Update and check bullets
         for (int i = Player.bullets.size() - 1; i >= 0; i--) {
             Bullet bullet = Player.bullets.get(i);
 
-            // Log bullet position and player's health for debugging
-            System.out.printf("Bullet at position X: %d, Y: %d%n", bullet.x, bullet.y);
-            System.out.printf("Player Health: %d%n", player.health);
+            // Create bullet's world collision box
+            Rectangle bulletBox = new Rectangle(
+                    bullet.x + player.playerX - player.screenX,
+                    bullet.y + player.playerY - player.screenY,
+                    bullet.width,
+                    bullet.height
+            );
 
-            if (bullet.calculateRectangle().intersects(player.bounds)) {
-                player.takeDamage(bullet.damage); // Apply damage to the player
-                System.out.println("Player hit by bullet! Damage taken: " + bullet.damage);
-                Player.bullets.remove(i); // Remove the bullet after it hits
+            // Check mob collisions
+            for (int j = mobs.size() - 1; j >= 0; j--) {
+                AIMob mob = mobs.get(j);
+                if (bulletBox.intersects(mob.getWorldCollisionBox())) {
+                    mob.takeDamage(bullet.damage);
+                    Player.bullets.remove(i);
+                    break;
+                }
+            }
+        }
+
+        // Update mobs and remove dead ones
+        for (int i = mobs.size() - 1; i >= 0; i--) {
+            AIMob mob = mobs.get(i);
+            mob.update();
+            if (mob.getHealth() <= 0) {
+                mobs.remove(i);
             }
         }
     }

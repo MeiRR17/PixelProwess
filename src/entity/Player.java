@@ -473,13 +473,14 @@ public class Player extends Entity {
         g2.drawString(message, messageX, messageY);
     }
 
-    public void draw(Graphics2D g2) throws IOException {
+    public void draw(Graphics2D g2) {
         // Draw the player's current sprite
         BufferedImage image = getCurrentSpriteImage();
         g2.drawImage(image, screenX, screenY, playerWidth, playerHeight, null);
 
         // Draw the health bar
         drawHealthBar(g2);
+
 
         // Draw notification if the player is down
         if (!isAlive()) {
@@ -689,7 +690,6 @@ public class Player extends Entity {
     private void drawBounds(Graphics2D g2) {
         g2.setColor(Color.RED);
         g2.drawRect(screenX + bounds.x, screenY + bounds.y, bounds.width, bounds.height);
-        //g2.drawRoundRect(screenX + bounds.x, screenY + bounds.y, bounds.width, bounds.height,10,50);
     }
 
 

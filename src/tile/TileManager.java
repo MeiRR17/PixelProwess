@@ -128,7 +128,6 @@ public class TileManager {
         tiles[21] = new Tile();
         tiles[21].image = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("tiles/newTiles/place/chest/legenGrass.png")));
         tiles[21].collision = true;
-
         // Tile 22 - rare chest
         tiles[22] = new Tile();
         tiles[22].image = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("tiles/newTiles/place/chest/rareGrass.png")));
@@ -182,7 +181,11 @@ public class TileManager {
         // Tile 32 - outward up mountain
         tiles[32] = new Tile();
         tiles[32].image = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("tiles/newTiles/ground/water/cliff/outward/up.png")));
-    }
+        tiles[32].collision = true;
+        tiles[32].collisionAreas = new Rectangle[4];
+        tiles[32].collisionAreas[2] = new Rectangle(0, gamePanel.tileSize / 2, gamePanel.tileSize / 2, gamePanel.tileSize / 2);
+        tiles[32].collisionAreas[3] = new Rectangle(gamePanel.tileSize / 2, gamePanel.tileSize / 2, gamePanel.tileSize / 2, gamePanel.tileSize / 2); // Bottom-right
+        }
 
 
     // Load the map from a text file and parse it into the mapNumber array
@@ -236,7 +239,7 @@ public class TileManager {
             // Calculate the screen position based on the player's position
             int screenX = worldX - gamePanel.player.playerX + gamePanel.player.screenX;
             int screenY = worldY - gamePanel.player.playerY + gamePanel.player.screenY;
-            if (tileNumber==1||tileNumber==2){
+            if (tileNumber == 1 || tileNumber == 2) {
                 collisionBounds[worldCol][worldRow] = new Rectangle(screenX, screenY, gamePanel.tileSize, gamePanel.tileSize);
             }
 
@@ -247,6 +250,13 @@ public class TileManager {
                     worldY - gamePanel.tileSize < gamePanel.player.playerY + gamePanel.player.screenY) {
                 // Draw the tile image at the calculated screen position
                 g2.drawImage(tiles[tileNumber].image, screenX, screenY, gamePanel.tileSize, gamePanel.tileSize, null);
+
+                // Highlight collision tiles with a red border
+                if (tiles[tileNumber].collision) {
+                    g2.setColor(Color.RED); // Set the color for the border
+                    g2.setStroke(new BasicStroke(2)); // Set the stroke width
+                    g2.drawRect(screenX, screenY, gamePanel.tileSize, gamePanel.tileSize); // Draw the border
+                }
             }
             worldCol++;
 

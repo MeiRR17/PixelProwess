@@ -147,17 +147,17 @@ public class Player extends Entity {
 
     private void checkNearbyWeapons() {
         nearbyWeapon = null; // Reset the nearby weapon
-        for (int i = 0; i < gamePanel.weapons.length; i++) {
-            Weapon weapon = gamePanel.weapons[i];
-            if (weapon != null) {
-                // Calculate the distance between the player and the weapon
-                double distance = Math.sqrt(Math.pow(playerX - weapon.worldX, 2) + Math.pow(playerY - weapon.worldY, 2));
-                if (distance < 100) { // Adjust the distance as needed
-                    nearbyWeapon = weapon; // Store the nearby weapon
-                    break; // Exit the loop if a nearby weapon is found
-                }
+        for (Weapon weapon : gamePanel.weapons) {
+            if (weapon != null && isWithinPickupRange(weapon)) {
+                nearbyWeapon = weapon; // Store the nearby weapon
+                break; // Exit the loop if a nearby weapon is found
             }
         }
+    }
+
+    private boolean isWithinPickupRange(Weapon weapon) {
+        double distance = Math.sqrt(Math.pow(playerX - weapon.worldX, 2) + Math.pow(playerY - weapon.worldY, 2));
+        return distance < 100; // Adjust the distance as needed
     }
 
     public void pickUpObject(Weapon weapon) {

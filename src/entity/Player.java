@@ -418,7 +418,7 @@ public class Player extends Entity {
                     bullets.get(i).x += speed;
                 }
                 case "up&right" -> {
-                    bullets.get(i).y += adjustedSpeed;
+                    bullets.get(i).y += (int) adjustedSpeed;
                     bullets.get(i).x -= adjustedSpeed;
                 }
                 case "up&left" -> {

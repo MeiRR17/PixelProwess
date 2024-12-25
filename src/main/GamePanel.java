@@ -52,6 +52,33 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
         player = new Player(this, keyHandler, mouseHandler); // Updated line
 //        System.out.println(something);
     }
+    public GamePanel(JFrame frame) throws IOException {
+        this.frame = frame;
+        this.setPreferredSize(new Dimension(800, 600)); // Set a fixed windowed resolution
+        this.setDoubleBuffered(true); // For smoother rendering
+        this.setFocusable(true);
+        this.addMouseMotionListener(this);
+        this.addKeyListener(keyHandler);
+        isFullscreen = false; // Ensure fullscreen is disabled
+    }
+
+//    private void toggleFullScreen() {
+//        if (isFullscreen) {
+//            // Switch to windowed mode
+//            frame.dispose(); // Dispose of the current frame
+//            frame.setUndecorated(false); // Remove fullscreen decorations
+//            frame.setSize(800, 600); // Set your desired window size
+//            frame.setLocationRelativeTo(null); // Center the window
+//            frame.setVisible(true); // Show the window
+//        } else {
+//            // Switch to fullscreen mode
+//            frame.dispose(); // Dispose of the current frame
+//            frame.setUndecorated(true); // Remove window decorations
+//            frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // Maximize the frame
+//            frame.setVisible(true); // Show the frame
+//        }
+//        isFullscreen = !isFullscreen; // Toggle the state
+//    }
 
     public void gameSet() throws IOException {
         objectPlacer.placeObjects();

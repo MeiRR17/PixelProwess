@@ -1,5 +1,6 @@
 package main;
 
+import entity.AIMob;
 import entity.Player;
 import object.bullets.Bullet;
 import object.weapons.Weapon;
@@ -9,38 +10,32 @@ import utility.MouseHandler;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.io.IOException;
+import java.awt.Toolkit;
+import java.util.ArrayList;
+
 
 public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
+    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    public final int screenWidth = screenSize.width;
+    public final int screenHeight = screenSize.height - 30;
+    public ArrayList<AIMob> mobs = new ArrayList<>();
 
     // Screen settings
     public final int orgTileSize = 32; // 32x32 tile
     final int scale = 2; // Scaling the tile to make it bigger
 
     public final int tileSize = orgTileSize * scale;
-    public final int maxScreenColumn = 30;
+    public final int maxScreenCol = 30;
     public final int maxScreenRow = 18;
-    private static final Dimension size = Toolkit.getDefaultToolkit().getScreenSize(); // Gets the size of user's window
-
-    public final int screenWidth = size.width;
-    public final int screenHeight = size.height;
 
     public final int worldColumn = 100;
     public final int worldRow = 100;
 //    private int something = Toolkit.getDefaultToolkit().getScreenResolution();
 
-    private int frameCount = 0;
-    private int currentFPS = 0;
-    private long lastTime = System.nanoTime();
-
-    private boolean isFullscreen = false; // Track whether we are in fullscreen
-    private JFrame frame; // Reference to the JFrame
-
     int FPS = 60;
-    TileManager tileManager = new TileManager(this);
 
     KeyHandler keyHandler = new KeyHandler();
     Thread gameThread;
@@ -48,52 +43,31 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
     public ObjectPlacer objectPlacer = new ObjectPlacer(this);
     public Player player = new Player(this, keyHandler, null);
     public Weapon[] weapons = new Weapon[25];
+    public TileManager tileManager;
 
-
-    public GamePanel(JFrame frame) throws IOException {
-        this.frame = frame; // Assign the JFrame reference
-        this.setPreferredSize(new Dimension(screenWidth, screenHeight));
+    public GamePanel() throws IOException {
+        this.setPreferredSize(new Dimension(screenWidth, screenHeight)); // Set the wanted size of the panel
         this.setBackground(Color.black);
-        this.setDoubleBuffered(true);
+        this.setDoubleBuffered(true); // Set this component to be double buffered
         this.addKeyListener(keyHandler);
-        this.setFocusable(true);
+        this.setFocusable(true); // Make the GamePanel receive key input
         MouseHandler mouseHandler = new MouseHandler(player);
         this.addMouseListener(mouseHandler);
-        this.addMouseMotionListener(this);
-        player = new Player(this, keyHandler, mouseHandler);
-
-        // Add a key listener to toggle fullscreen mode using Alt + Enter
-        this.addKeyListener(new java.awt.event.KeyAdapter() {
-            @Override
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                if (evt.getKeyCode() == KeyEvent.VK_ENTER && evt.isAltDown()) { // Press 'Alt + Enter' to toggle fullscreen
-                    toggleFullScreen();
-                }
-            }
-        });
-    }
-
-    private void toggleFullScreen() {
-        if (isFullscreen) {
-            // Switch to windowed mode
-            frame.dispose(); // Dispose of the current frame
-            frame.setUndecorated(false); // Remove fullscreen decorations
-            frame.setSize(800, 600); // Set your desired window size
-            frame.setLocationRelativeTo(null); // Center the window
-            frame.setVisible(true); // Show the window
-        } else {
-            // Switch to fullscreen mode
-            frame.dispose(); // Dispose of the current frame
-            frame.setUndecorated(true); // Remove window decorations
-            frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // Maximize the frame
-            frame.setVisible(true); // Show the frame
-        }
-        isFullscreen = !isFullscreen; // Toggle the state
+        this.addMouseMotionListener(this); // Add the mouse motion listener
+        player = new Player(this, keyHandler, mouseHandler); // Updated line
+        tileManager = new TileManager(this);
+//        System.out.println(something);
     }
 
     public void gameSet() throws IOException {
         objectPlacer.placeObjects();
+        // Add multiple mobs to the list
+        for (int i = 0; i < 5; i++) {
+            mobs.add(new AIMob(this, player, tileManager)); // Pass the tileManager instance
+        }
     }
+
+
 
     public void startGameThread() {
         gameThread = new Thread(this);
@@ -124,26 +98,18 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
             }
         }
 
-        // Layer 3: Draw the player
-        try {
-            player.draw(g2);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        for (AIMob mob : mobs) {
+            mob.draw(g2);
         }
-        drawBulletsLeft(g2, player.currentWeapon); // Pass the current weapon to get ammo count
 
-        // Draw FPS
-        drawFPS(g2);
+        // Layer 3: Draw the player
+        player.draw(g2); // Removed try-catch block
+
+        drawBulletsLeft(g2, player.currentWeapon); // Pass the current weapon to get ammo count
 
         g2.dispose(); // Dispose of this graphics context and release any system resources
     }
 
-    private void drawFPS(Graphics2D g2) {
-        String fpsText = "FPS: " + currentFPS;
-        g2.setColor(Color.WHITE);
-        g2.setFont(new Font("Arial", Font.PLAIN, 20)); // Adjust font size here
-        g2.drawString(fpsText, 10, 20); // Draw FPS at the top left corner
-    }
 
     private void drawBulletsLeft(Graphics2D g2, Weapon currentWeapon) {
         if (currentWeapon != null) {
@@ -161,29 +127,31 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
 
     @Override
     public void run() {
-        double interval = 1_000_000_000.0 / FPS;
-        long lastTime = System.nanoTime();
-        long now;
+        double interval = (double) 1000000000 / FPS;
+        double nextDrawTime = System.nanoTime() + interval;
 
         while (gameThread != null) {
-            now = System.nanoTime();
-            double delta = (now - lastTime) / interval;
-
-            if (delta >= 1) {
-                try {
-                    update();
-                    repaint();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                lastTime = now;
-            }
-
-            // Sleep the thread for a short duration
+            // UPDATE : update information
             try {
-                Thread.sleep(1); // Prevent busy-waiting
+                update();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            // DRAW : draw the screen (basically the FPS of the game)
+            repaint();
+
+            try {
+                double remainingTime = nextDrawTime - System.nanoTime();
+                remainingTime /= 1000000;
+
+                if (remainingTime < 0) {
+                    remainingTime = 0;
+                }
+
+                Thread.sleep((long) remainingTime);
+                nextDrawTime += interval;
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
     }
@@ -191,18 +159,35 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
     public void update() throws IOException {
         player.update();
 
-        // Check for bullet collisions with the player
+        // Update and check bullets
         for (int i = Player.bullets.size() - 1; i >= 0; i--) {
             Bullet bullet = Player.bullets.get(i);
 
-            // Log bullet position and player's health for debugging
-            System.out.printf("Bullet at position X: %d, Y: %d%n", bullet.x, bullet.y);
-            System.out.printf("Player Health: %d%n", player.health);
+            // Create bullet's world collision box
+            Rectangle bulletBox = new Rectangle(
+                    bullet.x + player.playerX - player.screenX,
+                    bullet.y + player.playerY - player.screenY,
+                    bullet.width,
+                    bullet.height
+            );
 
-            if (bullet.calculateRectangle().intersects(player.bounds)) {
-                player.takeDamage(bullet.damage); // Apply damage to the player
-                System.out.println("Player hit by bullet! Damage taken: " + bullet.damage);
-                Player.bullets.remove(i); // Remove the bullet after it hits
+            // Check mob collisions
+            for (int j = mobs.size() - 1; j >= 0; j--) {
+                AIMob mob = mobs.get(j);
+                if (bulletBox.intersects(mob.getWorldCollisionBox())) {
+                    mob.takeDamage(bullet.damage);
+                    Player.bullets.remove(i);
+                    break;
+                }
+            }
+        }
+
+        // Update mobs and remove dead ones
+        for (int i = mobs.size() - 1; i >= 0; i--) {
+            AIMob mob = mobs.get(i);
+            mob.update();
+            if (mob.getHealth() <= 0) {
+                mobs.remove(i);
             }
         }
     }

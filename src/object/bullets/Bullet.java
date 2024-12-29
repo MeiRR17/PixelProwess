@@ -11,6 +11,8 @@ public class Bullet {
     public BufferedImage image;
     public boolean bulletCollision = false;
     public int damage;
+    public int width;
+    public int height;
     private int distanceTraveled; // Distance traveled by the bullet
     private final int maxDistance; // Maximum distance before damage is fully lost
 

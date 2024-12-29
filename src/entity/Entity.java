@@ -2,7 +2,7 @@ package entity;
 
 import java.awt.*;
 
-public class Entity {
+public abstract class Entity {
 
     public int playerX, playerY;
     public int speed;
@@ -11,5 +11,8 @@ public class Entity {
     public int spriteNumber = 1;
     public Rectangle bounds;
     public int solidAreaDefaultX, solidAreaDefaultY;
-    public boolean playerCollision = false;//default
+    public boolean playerCollision = false; // Default
+
+    public abstract void update();
+    public abstract void draw(Graphics2D g2);
 }

@@ -106,22 +106,22 @@ public class Player extends Entity {
 
     private void loadPlayerImages() throws IOException {
         String[][] skins = {
-                {"/player/skin1/up/stand.png", "/player/skin1/up/walk1.png", "/player/skin1/up/walk2.png"},
-                {"/player/skin1/down/stand.png", "/player/skin1/down/walk1.png", "/player/skin1/down/walk2.png"},
-                {"/player/skin1/right/stand.png", "/player/skin1/right/walk1.png", "/player/skin1/right/walk2.png"},
-                {"/player/skin1/left/stand.png", "/player/skin1/left/walk1.png", "/player/skin1/left/walk2.png"},
-                {"/player/skin2/up/stand.png", "/player/skin2/up/walk1.png", "/player/skin2/up/walk2.png"},
-                {"/player/skin2/down/stand.png", "/player/skin2/down/walk1.png", "/player/skin2/down/walk2.png"},
-                {"/player/skin2/right/stand.png", "/player/skin2/right/walk1.png", "/player/skin2/right/walk2.png"},
-                {"/player/skin2/left/stand.png", "/player/skin2/left/walk1.png", "/player/skin2/left/walk2.png"},
-                {"/player/skin3/up/stand.png", "/player/skin3/up/walk1.png", "/player/skin3/up/walk2.png"},
-                {"/player/skin3/down/stand.png", "/player/skin3/down/walk1.png", "/player/skin3/down/walk2.png"},
-                {"/player/skin3/right/stand.png", "/player/skin3/right/walk1.png", "/player/skin3/right/walk2.png"},
-                {"/player/skin3/left/stand.png", "/player/skin3/left/walk1.png", "/player/skin3/left/walk2.png"},
-                {"/player/skin4/up/stand.png", "/player/skin4/up/walk1.png", "/player/skin4/up/walk2.png"},
-                {"/player/skin4/down/stand.png", "/player/skin4/down/walk1.png", "/player/skin4/down/walk2.png"},
-                {"/player/skin4/right/stand.png", "/player/skin4/right/walk1.png", "/player/skin4/right/walk2.png"},
-                {"/player/skin4/left/stand.png", "/player/skin4/left/walk1.png", "/player/skin4/left/walk2.png"},
+                {"/player/brock/up/stand.png", "/player/brock/up/walk1.png", "/player/brock/up/walk2.png"},
+                {"/player/brock/down/stand.png", "/player/brock/down/walk1.png", "/player/brock/down/walk2.png"},
+                {"/player/brock/right/stand.png", "/player/brock/right/walk1.png", "/player/brock/right/walk2.png"},
+                {"/player/brock/left/stand.png", "/player/brock/left/walk1.png", "/player/brock/left/walk2.png"},
+                {"/player/riley/up/stand.png", "/player/riley/up/walk1.png", "/player/riley/up/walk2.png"},
+                {"/player/riley/down/stand.png", "/player/riley/down/walk1.png", "/player/riley/down/walk2.png"},
+                {"/player/riley/right/stand.png", "/player/riley/right/walk1.png", "/player/riley/right/walk2.png"},
+                {"/player/riley/left/stand.png", "/player/riley/left/walk1.png", "/player/riley/left/walk2.png"},
+                {"/player/pip/up/stand.png", "/player/pip/up/walk1.png", "/player/pip/up/walk2.png"},
+                {"/player/pip/down/stand.png", "/player/pip/down/walk1.png", "/player/pip/down/walk2.png"},
+                {"/player/pip/right/stand.png", "/player/pip/right/walk1.png", "/player/pip/right/walk2.png"},
+                {"/player/pip/left/stand.png", "/player/pip/left/walk1.png", "/player/pip/left/walk2.png"},
+                {"/player/finn/up/stand.png", "/player/finn/up/walk1.png", "/player/finn/up/walk2.png"},
+                {"/player/finn/down/stand.png", "/player/finn/down/walk1.png", "/player/finn/down/walk2.png"},
+                {"/player/finn/right/stand.png", "/player/finn/right/walk1.png", "/player/finn/right/walk2.png"},
+                {"/player/finn/left/stand.png", "/player/finn/left/walk1.png", "/player/finn/left/walk2.png"},
         };
 
         Random rand = new Random();

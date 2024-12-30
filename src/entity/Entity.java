@@ -13,6 +13,8 @@ public abstract class Entity {
     public int solidAreaDefaultX, solidAreaDefaultY;
     public boolean playerCollision = false; // Default
 
+    public abstract void takeDamage(int damage);
+
     public abstract void update();
     public abstract void draw(Graphics2D g2);
 }

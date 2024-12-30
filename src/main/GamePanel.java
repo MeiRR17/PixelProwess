@@ -165,8 +165,8 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
 
             // Create bullet's world collision box
             Rectangle bulletBox = new Rectangle(
-                    bullet.x + player.playerX - player.screenX,
-                    bullet.y + player.playerY - player.screenY,
+                    bullet.x,  // Remove the player position offset
+                    bullet.y,  // Remove the player position offset
                     bullet.width,
                     bullet.height
             );
@@ -174,10 +174,15 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
             // Check mob collisions
             for (int j = mobs.size() - 1; j >= 0; j--) {
                 AIMob mob = mobs.get(j);
-                if (bulletBox.intersects(mob.getWorldCollisionBox())) {
+                Rectangle mobBox = mob.getWorldCollisionBox();
+
+                // Create mob's actual world position box
+                if (bulletBox.intersects(mobBox)) {
+                    // Apply damage from bullet to mob
                     mob.takeDamage(bullet.damage);
+                    System.out.println("Mob hit! Health: " + mob.getHealth()); // Debug line
                     Player.bullets.remove(i);
-                    break;
+                    break;  // Break since bullet is removed
                 }
             }
         }
@@ -188,6 +193,7 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
             mob.update();
             if (mob.getHealth() <= 0) {
                 mobs.remove(i);
+                System.out.println("Mob eliminated!"); // Debug line
             }
         }
     }

@@ -1,7 +1,8 @@
 package main;
 
-import entity.AIMob;
 import entity.Player;
+import entity.ui.BaseMob;
+import entity.ui.Goblin;
 import object.bullets.Bullet;
 import object.weapons.Weapon;
 import tile.TileManager;
@@ -21,7 +22,8 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     public final int screenWidth = screenSize.width;
     public final int screenHeight = screenSize.height - 30;
-    public ArrayList<AIMob> mobs = new ArrayList<>();
+    public ArrayList<BaseMob> mobs = new ArrayList<>(); // Update to BaseMob
+    public boolean debug = false; // Add debug mode flag
 
     // Screen settings
     public final int orgTileSize = 32; // 32x32 tile
@@ -61,9 +63,9 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
 
     public void gameSet() throws IOException {
         objectPlacer.placeObjects();
-        // Add multiple mobs to the list
+        // Update mob creation to match constructor
         for (int i = 0; i < 5; i++) {
-            mobs.add(new AIMob(this, player, tileManager)); // Pass the tileManager instance
+            mobs.add(new Goblin(this, player, tileManager));
         }
     }
 
@@ -88,26 +90,22 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
 
-        // Layer 1: Draw the tiles
         tileManager.draw(g2);
 
-        // Layer 2: Draw the weapons
         for (Weapon weapon : weapons) {
             if (weapon != null) {
                 weapon.draw(g2, this);
             }
         }
 
-        for (AIMob mob : mobs) {
+        for (BaseMob mob : mobs) {
             mob.draw(g2);
         }
 
-        // Layer 3: Draw the player
-        player.draw(g2); // Removed try-catch block
+        player.draw(g2);
+        drawBulletsLeft(g2, player.currentWeapon);
 
-        drawBulletsLeft(g2, player.currentWeapon); // Pass the current weapon to get ammo count
-
-        g2.dispose(); // Dispose of this graphics context and release any system resources
+        g2.dispose();
     }
 
 
@@ -162,38 +160,32 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
         // Update and check bullets
         for (int i = Player.bullets.size() - 1; i >= 0; i--) {
             Bullet bullet = Player.bullets.get(i);
-
-            // Create bullet's world collision box
             Rectangle bulletBox = new Rectangle(
-                    bullet.x,  // Remove the player position offset
-                    bullet.y,  // Remove the player position offset
+                    bullet.x,
+                    bullet.y,
                     bullet.width,
                     bullet.height
             );
 
             // Check mob collisions
             for (int j = mobs.size() - 1; j >= 0; j--) {
-                AIMob mob = mobs.get(j);
+                BaseMob mob = mobs.get(j);
                 Rectangle mobBox = mob.getWorldCollisionBox();
 
-                // Create mob's actual world position box
                 if (bulletBox.intersects(mobBox)) {
-                    // Apply damage from bullet to mob
                     mob.takeDamage(bullet.damage);
-                    System.out.println("Mob hit! Health: " + mob.getHealth()); // Debug line
                     Player.bullets.remove(i);
-                    break;  // Break since bullet is removed
+                    break;
                 }
             }
         }
 
         // Update mobs and remove dead ones
         for (int i = mobs.size() - 1; i >= 0; i--) {
-            AIMob mob = mobs.get(i);
+            BaseMob mob = mobs.get(i);
             mob.update();
             if (mob.getHealth() <= 0) {
                 mobs.remove(i);
-                System.out.println("Mob eliminated!"); // Debug line
             }
         }
     }

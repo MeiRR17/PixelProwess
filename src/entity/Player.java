@@ -59,6 +59,12 @@ public class Player extends Entity {
 
     private Weapon nearbyWeapon; // To store the nearby weapon
 
+    private CharacterStats characterStats;
+    private String characterName;
+    private int selectedCharacterIndex;
+    private double baseCriticalHitChance = 0.05; // 5% base critical hit chance
+    private double baseDefense = 1.0;
+
     public Player(GamePanel gamePanel, KeyHandler keyHandler, MouseHandler mouseHandler) throws IOException {
         this.gamePanel = gamePanel;
         this.keyHandler = keyHandler;
@@ -82,6 +88,26 @@ public class Player extends Entity {
         setDefaultValues();
         loadPlayerImages();
         bullets = new ArrayList<>();
+        // Determine character name based on the loaded skin
+        determineCharacterName();
+
+        // Initialize character stats
+        this.characterStats = new CharacterStats(characterName);
+
+        // Apply character stats
+        applyCharacterStats();
+
+    }
+
+    private void applyCharacterStats() {
+        // Apply health modifier
+        this.health = (int)(100 * characterStats.getHealthMultiplier());
+
+        // Apply speed modifier
+        this.speed = (int)(SPEED * characterStats.getSpeedMultiplier());
+
+        // Store modified defense value
+        this.baseDefense *= characterStats.getDefenseMultiplier();
     }
 
     private void setDefaultValues() {
@@ -91,19 +117,28 @@ public class Player extends Entity {
         direction = "down";
     }
 
+    @Override
     public void takeDamage(int damage) {
-        health -= damage;
+        // Apply defense reduction to incoming damage
+        int reducedDamage = (int)(damage / baseDefense);
+        health -= reducedDamage;
         if (health < 0) {
-            health = 0; // Prevent health from going below zero
+            health = 0;
         }
-        System.out.println("Player health after damage: " + health);
+        System.out.println(characterName + " took " + reducedDamage + " damage (reduced from " + damage + ")");
     }
 
     public boolean isAlive() {
         return health > 0;
     }
 
-
+    private void determineCharacterName() {
+        // This method should be called after loading the player images
+        // You can determine the character based on which skin was randomly selected
+        Random rand = new Random();
+        String[] characters = {"pip", "brock", "finn", "riley"};
+        this.characterName = characters[selectedCharacterIndex];
+    }
     private void loadPlayerImages() throws IOException {
         String[][] skins = {
                 {"/player/brock/up/stand.png", "/player/brock/up/walk1.png", "/player/brock/up/walk2.png"},
@@ -125,16 +160,16 @@ public class Player extends Entity {
         };
 
         Random rand = new Random();
-        int skinIndex = rand.nextInt(4) * 4;
+        selectedCharacterIndex = rand.nextInt(4); // Randomly select a character index (0-3)
 
         BufferedImage[] standImages = new BufferedImage[4];
         BufferedImage[] move1Images = new BufferedImage[4];
         BufferedImage[] move2Images = new BufferedImage[4];
 
         for (int i = 0; i < 4; i++) {
-            standImages[i] = loadImage(skins[skinIndex + i][0]);
-            move1Images[i] = loadImage(skins[skinIndex + i][1]);
-            move2Images[i] = loadImage(skins[skinIndex + i][2]);
+            standImages[i] = loadImage(skins[selectedCharacterIndex * 4 + i][0]);
+            move1Images[i] = loadImage(skins[selectedCharacterIndex * 4 + i][1]);
+            move2Images[i] = loadImage(skins[selectedCharacterIndex * 4 + i][2]);
         }
 
         // Assign loaded images to variables
@@ -142,6 +177,8 @@ public class Player extends Entity {
         downStand = standImages[1]; downMove1 = move1Images[1]; downMove2 = move2Images[1];
         rightStand = standImages[2]; rightMove1 = move1Images[2]; rightMove2 = move2Images[2];
         leftStand = standImages[3]; leftMove1 = move1Images[3]; leftMove2 = move2Images[3];
+
+        // Return the character name based on the selected index
     }
 
 
@@ -581,7 +618,34 @@ public class Player extends Entity {
             bullets.add(new Bullet(bulletX, bulletY, angle, bulletImage, currentWeapon.DAMAGE));
         }
 
+        // Calculate if this shot is a critical hit
+        double criticalChance = baseCriticalHitChance * characterStats.getCriticalHitChanceMultiplier();
+        boolean isCritical = Math.random() < criticalChance;
+
+        // Calculate modified damage
+        int modifiedDamage = currentWeapon.DAMAGE;
+        modifiedDamage = (int)(modifiedDamage * characterStats.getAttackMultiplier());
+        if (isCritical) {
+            modifiedDamage *= 2; // Critical hits do double damage
+        }
+        if (currentWeapon instanceof Shotgun) {
+            int numBullets = 5;
+            double damagePerBullet = (double) modifiedDamage / numBullets;
+
+            for (int i = 0; i < numBullets; i++) {
+                double bulletAngle = angle + Math.toRadians((i - 2) * 10);
+                bullets.add(new Bullet(bulletX, bulletY, bulletAngle, bulletImage, (int) damagePerBullet));
+            }
+        } else {
+            bullets.add(new Bullet(bulletX, bulletY, angle, bulletImage, modifiedDamage));
+        }
+
+        if (isCritical) {
+            System.out.println("Critical Hit!");
+        }
         currentWeapon.ammoLeft--; // Decrease the ammo count
+
+
     }
 
     private double calculateAngleToMouse() {

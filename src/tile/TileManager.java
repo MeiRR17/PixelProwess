@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class TileManager {
@@ -29,6 +30,18 @@ public class TileManager {
 
         getTileImage(); // Load the tile images
         load("/maps/map.txt"); // Load the map layout
+    }
+
+    public ArrayList<Object> getCollisionTiles() {
+        ArrayList<Object> collisionTiles = new ArrayList<>();
+        for (int col = 0; col < gamePanel.worldColumn; col++) {
+            for (int row = 0; row < gamePanel.worldRow; row++) {
+                if (tiles[mapNumber[col][row]].collision) {
+                    collisionTiles.add(new Point(col * gamePanel.tileSize, row * gamePanel.tileSize));
+                }
+            }
+        }
+        return collisionTiles;
     }
 
     // Load tile images from the resources

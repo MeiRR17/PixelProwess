@@ -10,7 +10,7 @@ import java.util.Objects;
 import java.util.Random;
 
 public abstract class Weapon implements Cloneable {
-    private static final Random random = new Random();
+    public static final Random random = new Random();
     protected String gunImagePath;  // Image used in-game
     protected String[] iconImagePath; // Image used as tile icon
     protected String bulletPath;

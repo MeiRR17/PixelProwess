@@ -6,7 +6,7 @@ import tile.TileManager;
 
 public class Uruk extends BaseMob {
     public Uruk(GamePanel gamePanel, Player player, TileManager tileManager) {
-        super(gamePanel, player, tileManager, 1.0, 1.2, 300);
+        super(gamePanel, player, tileManager, 1.1, 1.2, 350, 64);  // 64x64 size
     }
 
     @Override
@@ -16,6 +16,6 @@ public class Uruk extends BaseMob {
 
     @Override
     protected int getMaxHealth() {
-        return 300;
+        return 450;
     }
 }

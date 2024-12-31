@@ -27,9 +27,13 @@ public class Bullet {
     }
 
     public void update() {
+        // Calculate the new position first
+        int newX = x + (int) (speed * Math.cos(angle));
+        int newY = y + (int) (speed * Math.sin(angle));
+
         // Update position
-        x += (int) (speed * Math.cos(angle)); // Move in the x direction
-        y += (int) (speed * Math.sin(angle)); // Move in the y direction
+        x = newX;
+        y = newY;
 
         // Update distance traveled
         distanceTraveled += speed;

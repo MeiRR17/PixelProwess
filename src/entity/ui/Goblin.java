@@ -5,9 +5,8 @@ import main.GamePanel;
 import tile.TileManager;
 
 public class Goblin extends BaseMob {
-    // Update constructor to match usage
     public Goblin(GamePanel gamePanel, Player player, TileManager tileManager) {
-        super(gamePanel, player, tileManager, 1.2, 0.8, 100);  // Pass hardcoded values to super
+        super(gamePanel, player, tileManager, 1.3, 0.8, 100, 32);  // 32x32 size
     }
 
     @Override

@@ -22,33 +22,37 @@ public abstract class BaseMob extends Entity {
     protected double damageMultiplier;
     protected int baseSpeed = 2;
     protected int baseDamage = 10;
-    protected static final int MOB_WIDTH = 64;
-    protected static final int MOB_HEIGHT = 64;
+
+    // Remove static size constants and make them instance variables
+    protected final int MOB_WIDTH;
+    protected final int MOB_HEIGHT;
 
     // Animation states
-    protected String currentState = "idle";
+    protected String currentState = "walk";
     protected String direction = "down";
     protected int currentFrame = 0;
     protected int animationCounter = 0;
     protected int animationSpeed = 10;
-    protected int worldX, worldY, width, height;
+    protected int worldX, worldY;
 
     // Sprite storage
-    protected BufferedImage[][][] sprites; // [state][direction][frame]
-    protected final String[] states = {"idle", "walk", "attack", "hurt", "death"};
+    protected BufferedImage[][][] sprites;
+    protected final String[] states = {"walk", "attack", "hurt", "death"};
     protected final String[] directions = {"down", "left", "right", "up"};
     protected boolean isDead = false;
     protected boolean isHurt = false;
     protected boolean isAttacking = false;
     protected long lastAttackTime = 0;
+    protected long lastHurtTime = 0;
     protected int attackCooldown = 1000;
+    protected int hurtCooldown = 3000;
 
     protected Rectangle worldCollisionBox;
     protected boolean debug = false;
     protected int maxHealth;
 
     public BaseMob(GamePanel gamePanel, Player player, TileManager tileManager,
-                   double speedMult, double damageMult, int maxHealth) {
+                   double speedMult, double damageMult, int maxHealth, int mobSize) {
         this.gamePanel = gamePanel;
         this.player = player;
         this.tileManager = tileManager;
@@ -57,31 +61,36 @@ public abstract class BaseMob extends Entity {
         this.maxHealth = maxHealth;
         this.health = maxHealth;
         this.speed = (int)(baseSpeed * speedMultiplier);
-        bounds = new Rectangle(12, 12, MOB_WIDTH - 24, MOB_HEIGHT - 24);
-        worldCollisionBox = new Rectangle(0, 0, MOB_WIDTH, MOB_HEIGHT);
 
-        // Initialize position randomly in the world
+        // Set mob-specific size
+        this.MOB_WIDTH = mobSize;
+        this.MOB_HEIGHT = mobSize;
+
+        // Adjust collision bounds based on mob size
+        // Make the collision box 75% of the mob size and centered
+        int boundSize = (int)(mobSize * 0.75);
+        int offset = (mobSize - boundSize) / 2;
+        bounds = new Rectangle(offset, offset, boundSize, boundSize);
+        worldCollisionBox = new Rectangle(0, 0, boundSize, boundSize);
+
         spawnAtRandomLocation();
         loadSprites();
     }
 
-    // Add random spawn method
     protected void spawnAtRandomLocation() {
         boolean validLocation = false;
         while (!validLocation) {
             worldX = random.nextInt(gamePanel.worldColumn) * gamePanel.tileSize;
             worldY = random.nextInt(gamePanel.worldRow) * gamePanel.tileSize;
 
-            int col = worldX / gamePanel.tileSize;
-            int row = worldY / gamePanel.tileSize;
-
-            if (col < gamePanel.worldColumn && row < gamePanel.worldRow) {
-                if (!tileManager.tiles[tileManager.mapNumber[col][row]].collision) {
-                    validLocation = true;
-                }
-            }
+            // Check multiple points for collision to ensure the mob fits
+            validLocation = !checkCollision(worldX, worldY) &&
+                    !checkCollision(worldX + MOB_WIDTH, worldY) &&
+                    !checkCollision(worldX, worldY + MOB_HEIGHT) &&
+                    !checkCollision(worldX + MOB_WIDTH, worldY + MOB_HEIGHT);
         }
     }
+
     // Add death animation update
     protected void updateDeathAnimation() {
         if (currentState.equals("death")) {
@@ -104,48 +113,58 @@ public abstract class BaseMob extends Entity {
         }
     }
 
+    protected BufferedImage resizeImage(BufferedImage image, int width, int height) {
+        if (image == null) return null;
+
+        // Create a new BufferedImage with the desired dimensions
+        BufferedImage resizedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+
+        // Draw the original image to the resized image
+        Graphics2D g2d = resizedImage.createGraphics();
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2d.drawImage(image, 0, 0, width, height, null);
+        g2d.dispose();
+
+        return resizedImage;
+    }
 
     protected abstract String getMobType();
 
-    protected void loadSprites() {
-        sprites = new BufferedImage[states.length][4][8];
+    private BufferedImage loadSprite(String state, String direction, int frame) {
         try {
-            // Load idle sprites (single frame per direction)
-            for (int d = 0; d < directions.length; d++) {
-                sprites[0][d][0] = loadSprite("idle/" + directions[d] + ".png");
-            }
+            // Construct the path based on your directory structure
+            String fullPath = "/mob/" + getMobType() + "/" + state + "/" + direction + "/" + frame + ".png";
+            BufferedImage originalImage = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(fullPath)));
 
-            // Load walk, attack, death animations (8 frames)
-            for (int i = 1; i < 4; i++) {
-                for (int d = 0; d < directions.length; d++) {
-                    for (int f = 0; f < 8; f++) {
-                        sprites[i][d][f] = loadSprite(states[i] + "/" + directions[d] + "/" + (f + 1) + ".png");
-                    }
-                }
-            }
-
-            // Load hurt animations (6 frames)
-            for (int d = 0; d < directions.length; d++) {
-                for (int f = 0; f < 6; f++) {
-                    sprites[4][d][f] = loadSprite("hurt/" + directions[d] + "/" + (f + 1) + ".png");
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+            // Resize the image to the mob's specific dimensions
+            return resizeImage(originalImage, MOB_WIDTH, MOB_HEIGHT);
+        } catch (IOException | NullPointerException e) {
+            System.err.println("Error loading sprite: " +"/mob/" + getMobType() + "/" + state + "/" + direction + "/" + frame + ".png");
+            return null;
         }
     }
 
-    private BufferedImage loadSprite(String path) throws IOException {
-        return ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/mobs/" + getMobType() + "/" + path)));
+    protected void loadSprites() {
+        sprites = new BufferedImage[states.length][directions.length][8];
+
+        // Load and resize sprites for each state, direction, and frame
+        for (int s = 0; s < states.length; s++) {
+            for (int d = 0; d < directions.length; d++) {
+                for (int f = 0; f < 8; f++) {
+                    sprites[s][d][f] = loadSprite(states[s], directions[d], f + 1);
+                }
+            }
+        }
     }
 
     @Override
     public void takeDamage(int damage) {
-        if (!isDead) {
+        if (!isDead && !isHurt && System.currentTimeMillis() - lastHurtTime > hurtCooldown) {
             health -= damage;
             isHurt = true;
             currentFrame = 0;
             currentState = "hurt";
+            lastHurtTime = System.currentTimeMillis();
 
             if (health <= 0) {
                 health = 0;
@@ -177,9 +196,19 @@ public abstract class BaseMob extends Entity {
     protected void updateAnimation() {
         animationCounter++;
         if (animationCounter >= animationSpeed) {
-            int maxFrames = currentState.equals("hurt") ? 6 : 8;
-            currentFrame = (currentFrame + 1) % maxFrames;
+            currentFrame = (currentFrame + 1) % 8;
             animationCounter = 0;
+
+            // Handle end of animations
+            if (currentState.equals("hurt") && currentFrame == 0) {
+                isHurt = false;
+                currentState = "walk";
+            } else if (currentState.equals("attack") && currentFrame == 0) {
+                isAttacking = false;
+                currentState = "walk";
+            } else if (currentState.equals("death") && currentFrame == 7) {
+                isDead = true;
+            }
         }
     }
 
@@ -260,11 +289,10 @@ public abstract class BaseMob extends Entity {
 
     protected BufferedImage getCurrentSprite() {
         int stateIndex = switch (currentState) {
-            case "idle" -> 0;
-            case "walk" -> 1;
-            case "attack" -> 2;
-            case "hurt" -> 3;
-            case "death" -> 4;
+            case "walk" -> 0;
+            case "attack" -> 1;
+            case "hurt" -> 2;
+            case "death" -> 3;
             default -> 0;
         };
 
@@ -304,22 +332,29 @@ public abstract class BaseMob extends Entity {
     protected abstract int getMaxHealth();
 
     protected boolean checkCollision(int newX, int newY) {
-        int col = newX / gamePanel.tileSize;
-        int row = newY / gamePanel.tileSize;
+        // Check corners of the collision box
+        int[][] points = {
+                {newX + bounds.x, newY + bounds.y},                    // Top-left
+                {newX + bounds.x + bounds.width, newY + bounds.y},     // Top-right
+                {newX + bounds.x, newY + bounds.y + bounds.height},    // Bottom-left
+                {newX + bounds.x + bounds.width, newY + bounds.y + bounds.height} // Bottom-right
+        };
 
-        return col < 0 || col >= gamePanel.worldColumn ||
-                row < 0 || row >= gamePanel.worldRow ||
-                tileManager.tiles[tileManager.mapNumber[col][row]].collision;
+        for (int[] point : points) {
+            int col = point[0] / gamePanel.tileSize;
+            int row = point[1] / gamePanel.tileSize;
+
+            if (col < 0 || col >= gamePanel.worldColumn ||
+                    row < 0 || row >= gamePanel.worldRow ||
+                    tileManager.tiles[tileManager.mapNumber[col][row]].collision) {
+                return true;
+            }
+        }
+        return false;
     }
-
     public int getHealth() {
         return health;
     }
 }
 
 // Specific mob implementations
-
-
-
-
-

@@ -1,8 +1,7 @@
 package main;
 
 import entity.Player;
-import entity.ui.BaseMob;
-import entity.ui.Goblin;
+import entity.ui.*;
 import object.bullets.Bullet;
 import object.weapons.Weapon;
 import tile.TileManager;
@@ -64,8 +63,11 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
     public void gameSet() throws IOException {
         objectPlacer.placeObjects();
         // Update mob creation to match constructor
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 2; i++) {
             mobs.add(new Goblin(this, player, tileManager));
+            mobs.add(new Orc(this, player, tileManager));
+            mobs.add(new Uruk(this, player, tileManager));
+            mobs.add(new Satan(this, player, tileManager));
         }
     }
 

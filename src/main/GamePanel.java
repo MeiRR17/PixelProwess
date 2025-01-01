@@ -36,18 +36,16 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
 
     public final int worldColumn = 100;
     public final int worldRow = 100;
-//    private int something = Toolkit.getDefaultToolkit().getScreenResolution();
 
     int FPS = 60;
 
-    KeyHandler keyHandler = new KeyHandler();
+    public KeyHandler keyHandler = new KeyHandler();
     Thread gameThread;
     public Collision collisionCheck = new Collision(this);
     public ObjectPlacer objectPlacer = new ObjectPlacer(this);
     public Player player = new Player(this, keyHandler, null);
     public Weapon[] weapons = new Weapon[25];
     public TileManager tileManager;
-    public List<Chest> chests;
 
     public GamePanel() throws IOException {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight)); // Set the wanted size of the panel
@@ -60,11 +58,14 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
         this.addMouseMotionListener(this); // Add the mouse motion listener
         player = new Player(this, keyHandler, mouseHandler); // Updated line
         tileManager = new TileManager(this);
-//        System.out.println(something);
+
+        // Initialize the chest list in objectPlacer
+        objectPlacer.chests = new ArrayList<>();
     }
 
+
     public void gameSet() throws IOException {
-        objectPlacer.placeObjects();
+        objectPlacer.placeObjects(); // Ensure objects are placed in objectPlacer.chests
         // Update mob creation to match constructor
         for (int i = 0; i < 2; i++) {
             mobs.add(new Goblin(this, player, tileManager));
@@ -73,8 +74,6 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
             mobs.add(new Satan(this, player, tileManager));
         }
     }
-
-
 
     public void startGameThread() {
         gameThread = new Thread(this);
@@ -107,7 +106,7 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
             mob.draw(g2);
         }
 
-        // After tileManager.draw(g2)
+        // Drawing chests from objectPlacer.chests
         for (Chest chest : objectPlacer.chests) {
             chest.draw(g2);
         }
@@ -117,7 +116,6 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
 
         g2.dispose();
     }
-
 
     private void drawBulletsLeft(Graphics2D g2, Weapon currentWeapon) {
         if (currentWeapon != null) {
@@ -187,6 +185,14 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
                     Player.bullets.remove(i);
                     break;
                 }
+            }
+        }
+
+        // Check if player is close to any chest and press E to open it
+        for (Chest chest : objectPlacer.chests) {
+            // Check if the chest is within range and the "E" key is pressed
+            if (chest.isWithinRange(player.playerX, player.playerY, 32) && keyHandler.isEPressed) {
+                chest.open();  // Open the chest if conditions are met
             }
         }
 

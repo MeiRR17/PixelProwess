@@ -329,12 +329,12 @@ public class Player extends Entity {
 
         // Check if the player is trying to pick up a weapon
         long currentTime = System.currentTimeMillis();
-        if (keyHandler.pressPickUpWeapon && nearbyWeapon != null && (currentTime - lastPickupTime) > PICKUP_COOLDOWN) {
+        if (keyHandler.isEPressed && nearbyWeapon != null && (currentTime - lastPickupTime) > PICKUP_COOLDOWN) {
             // Check for nearby chests first
             for (Chest chest : gamePanel.objectPlacer.chests) {
                 if (chest.isWithinRange(playerX, playerY, gamePanel.tileSize * 2)) {
                     chest.open();
-                    keyHandler.pressPickUpWeapon = false;
+                    keyHandler.isEPressed = false;
                     return;
                 }
             }

@@ -102,8 +102,16 @@ public class Chest {
         }
     }
 
+
     public boolean isWithinRange(int playerX, int playerY, int range) {
         return Math.sqrt(Math.pow(playerX - worldX, 2) + Math.pow(playerY - worldY, 2)) <= range;
+    }
+
+    public void update() {
+        // Check if the player is within range and the "E" key is pressed
+        if (isWithinRange(gamePanel.player.playerX, gamePanel.player.playerY, 32) && gamePanel.keyHandler.isEPressed) {
+            open();
+        }
     }
 
     public void draw(Graphics2D g2) {
@@ -116,6 +124,11 @@ public class Chest {
                     worldY + gamePanel.tileSize > gamePanel.player.playerY - gamePanel.player.screenY &&
                     worldY - gamePanel.tileSize < gamePanel.player.playerY + gamePanel.player.screenY) {
                 g2.drawImage(image, screenX, screenY, gamePanel.tileSize, gamePanel.tileSize, null);
+                if (isWithinRange(gamePanel.player.playerX, gamePanel.player.playerY, 32)) {
+                    g2.setColor(Color.WHITE);
+                    g2.setFont(new Font("Arial", Font.BOLD, 20));
+                    g2.drawString("Press E to open", screenX, screenY - 10);
+                }
             }
         }
     }

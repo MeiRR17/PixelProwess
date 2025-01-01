@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class TileManager {
-
     GamePanel gamePanel;
     public Tile[] tiles;
     public int[][] mapNumber;

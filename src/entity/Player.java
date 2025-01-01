@@ -3,6 +3,7 @@ package entity;
 import main.Collision;
 import main.GamePanel;
 import object.bullets.Bullet;
+import object.chests.Chest;
 import object.weapons.*;
 import utility.KeyHandler;
 import utility.MouseHandler;
@@ -329,8 +330,16 @@ public class Player extends Entity {
         // Check if the player is trying to pick up a weapon
         long currentTime = System.currentTimeMillis();
         if (keyHandler.pressPickUpWeapon && nearbyWeapon != null && (currentTime - lastPickupTime) > PICKUP_COOLDOWN) {
-            pickUpObject(nearbyWeapon); // Pass the nearby weapon to the pickup method
-            lastPickupTime = currentTime; // Update the last pickup time
+            // Check for nearby chests first
+            for (Chest chest : gamePanel.objectPlacer.chests) {
+                if (chest.isWithinRange(playerX, playerY, gamePanel.tileSize * 2)) {
+                    chest.open();
+                    keyHandler.pressPickUpWeapon = false;
+                    return;
+                }
+            }
+            // If no chest is nearby, proceed with normal weapon pickup logic
+            // ... your existing pickup logic ...
         }
 
         // Check for weapon switching
@@ -367,6 +376,7 @@ public class Player extends Entity {
             }
         }
     }
+
     private void switchToSmallGun() {
         if (smallGun != null) {
             currentWeapon = smallGun; // Switch to the small gun (pistol)

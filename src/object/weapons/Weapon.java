@@ -94,7 +94,7 @@ public abstract class Weapon implements Cloneable {
         }
     }
 
-    private void adjustStatsBasedOnRarity() {
+    public void adjustStatsBasedOnRarity() {
         switch (rarity) {
             case "common":
                 // No changes for common

@@ -3,6 +3,7 @@ package main;
 import entity.Player;
 import entity.ui.*;
 import object.bullets.Bullet;
+import object.chests.Chest;
 import object.weapons.Weapon;
 import tile.TileManager;
 import utility.KeyHandler;
@@ -15,6 +16,7 @@ import java.awt.event.MouseMotionListener;
 import java.io.IOException;
 import java.awt.Toolkit;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
@@ -45,6 +47,7 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
     public Player player = new Player(this, keyHandler, null);
     public Weapon[] weapons = new Weapon[25];
     public TileManager tileManager;
+    public List<Chest> chests;
 
     public GamePanel() throws IOException {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight)); // Set the wanted size of the panel
@@ -102,6 +105,11 @@ public class GamePanel extends JPanel implements Runnable, MouseMotionListener {
 
         for (BaseMob mob : mobs) {
             mob.draw(g2);
+        }
+
+        // After tileManager.draw(g2)
+        for (Chest chest : objectPlacer.chests) {
+            chest.draw(g2);
         }
 
         player.draw(g2);

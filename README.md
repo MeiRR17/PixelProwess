@@ -1,5 +1,7 @@
 # 🎮 PixelProwess – Final Project Guide
 
+## For the one who examines the project, please contact me so I'll give you the JSON file so you will be able to connect to Firebase.
+
 Welcome to **PixelProwess**, a simple yet fun 2D platformer game developed as a final project.  
 This guide will help any user – even with no prior experience – to set up, run, and use the game from GitHub.
 
